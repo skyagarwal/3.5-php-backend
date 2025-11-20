@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -130,7 +129,9 @@ class Banner extends Model
      */
     public function scopeActive($query): mixed
     {
-        return $query->where('status', '=', 1);
+        return $query->where('status', '=', 1)->whereHas('store', function ($query) {
+            $query->active();
+        });
     }
 
     /**

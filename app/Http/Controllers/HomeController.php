@@ -78,7 +78,7 @@ class HomeController extends Controller
         $criterias = AdminSpecialCriteria::where('status', 1)->get();
         $testimonials = AdminTestimonial::where('status', 1)->get();
 
-        $zones = Zone::where('status', 1)->get();
+        $zones = Zone::where('status', 1)->with('modules')->get();
         $zones = self::zone_format($zones);
 
         $landing_data = [

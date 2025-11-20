@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\Admin\DeliveryMan\DeliveryManController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\BusinessSettingsController;
 
 
 Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
-    Route::group(['middleware' => ['admin', 'current-module', 'actch:admin_panel' ]], function () {
+    Route::group(['middleware' => ['admin', 'current-module', 'actch:admin_panel']], function () {
         Route::get('/test', function () {
             // return view('admin-views.test.VendorPanel-tax-report');
             // return view('admin-views.test.surgeprice-setup.list');
@@ -15,9 +16,20 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             // return view('admin-views.test.components');
 
             // version-3.4
-            return view('admin-views.test.marketing-tools');
-            return view('admin-views.test.parcel-cancellation-setup');
+            // return view('admin-views.test.marketing-tools');
+            // return view('admin-views.test.parcel-cancellation-setup');
             // return view('admin-views.test.deliveryman-withdraw-transaction');
+
+            //React Landing New Page
+            // return view('admin-views.test.React_Landing.trust-section');
+            return view('admin-views.test.React_Landing.popular-clients');
+            // return view('admin-views.test.React_Landing.seller-app-download');
+            // return view('admin-views.test.React_Landing.deliveryman-app-download');
+            // return view('admin-views.test.React_Landing.banners-section');
+            // return view('admin-views.test.React_Landing.gallery-section');
+            // return view('admin-views.test.React_Landing.high-light-section');
+            // return view('admin-views.test.React_Landing.faq-section');
+
 
         });
         Route::get('get-all-stores', 'VendorController@get_all_stores')->name('get_all_stores');
@@ -179,8 +191,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         });
 
 
-
-
         Route::group(['prefix' => 'store', 'as' => 'store.'], function () {
             Route::get('get-stores-data/{store}', 'VendorController@get_store_data')->name('get-stores-data');
             Route::get('store-filter/{id}', 'VendorController@store_filter')->name('store-filter');
@@ -217,7 +227,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::post('status-filter', 'VendorController@status_filter')->name('status-filter');
 
 
-
                 Route::get('recommended-store', 'VendorController@recommended_store')->name('recommended_store');
                 Route::get('recommended-store-add', 'VendorController@recommended_store_add')->name('recommended_store_add');
                 Route::get('recommended-store-status/{id}/{status}', 'VendorController@recommended_store_status')->name('recommended_store_status');
@@ -251,7 +260,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         });
 
 
-        Route::get('addon/system-addons', function (){
+        Route::get('addon/system-addons', function () {
             return to_route('admin.system-addon.index');
         })->name('addon.index');
 
@@ -310,7 +319,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         });
 
 
-
         Route::group(['prefix' => 'business-settings', 'as' => 'business-settings.', 'middleware' => ['module:settings']], function () {
             Route::get('business-setup/{tab?}', 'BusinessSettingsController@business_index')->name('business-setup');
             Route::get('react-setup', 'BusinessSettingsController@react_setup')->name('react-setup');
@@ -350,6 +358,21 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::DELETE('react-landing-page-settings/{tab}/{key}', 'BusinessSettingsController@delete_react_landing_page_settings')->name('react-landing-page-settings-delete');
             Route::get('review-react-status/{id}/{status}', 'BusinessSettingsController@review_react_status')->name('review-react-status');
             Route::get('pages/react-landing-page-settings/testimonials/review-react-list/edit/{id}', 'BusinessSettingsController@review_react_edit')->name('review-react-edit');
+            Route::get('status-update/{type}/{key}', [BusinessSettingsController::class, 'statusUpdate'])->name('statusUpdate');
+
+            Route::post('pages/react-landing-page-settings/faq-store/', [BusinessSettingsController::class, 'reactFaqStore'])->name('reactFaqStore');
+            Route::get('pages/react-landing-page-settings/faq-status/{id}/{status}', [BusinessSettingsController::class, 'reactfaqStatus'])->name('reactfaqStatus');
+            Route::get('pages/react-landing-page-settings/faq/edit/{id}', [BusinessSettingsController::class, 'reactfaqEdit'])->name('reactfaqEdit');
+            Route::post('pages/react-landing-page-settings/faq-data/update/{id}', [BusinessSettingsController::class, 'reactFaqUpdate'])->name('reactFaqUpdate');
+            Route::delete('pages/react-landing-page-settings/faq/delete/{faq}', [BusinessSettingsController::class, 'reactfaqDestroy'])->name('reactfaqDestroy');
+
+            //promotional banner
+            Route::post('promotional-banner-store/', [BusinessSettingsController::class, 'react_promotional_banner_store'])->name('promotional-banner-store');
+            Route::get('promotional-banner-status/{id}/{status}', [BusinessSettingsController::class, 'react_promotional_banner_status'])->name('promotional-banner-status');
+            Route::post('promotional-banner/update/{id}', [BusinessSettingsController::class, 'react_promotional_banner_update'])->name('promotional-banner-update');
+            Route::delete('promotional-banner/delete/{react_promotional_banner}', [BusinessSettingsController::class, 'react_promotional_banner_destroy'])->name('promotional-banner-delete');
+
+
             Route::post('review-react-section/update/{id}', 'BusinessSettingsController@review_react_update')->name('review-react-update');
             Route::delete('review-react/delete/{review}', 'BusinessSettingsController@review_react_destroy')->name('review-react-delete');
             Route::get('pages/flutter-landing-page-settings/{tab?}', 'BusinessSettingsController@flutter_landing_page_settings')->name('flutter-landing-page-settings');
@@ -362,13 +385,13 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::POST('landing-page-settings/{tab}', 'BusinessSettingsController@update_landing_page_settings')->name('landing-page-settings');
             Route::DELETE('landing-page-settings/{tab}/{key}', 'BusinessSettingsController@delete_landing_page_settings')->name('landing-page-settings-delete');
 
-            Route::group(['prefix' => 'marketing' , 'as' => 'marketing.'], function () {
-                    Route::get('analytic-setup', 'Marketing\AnalyticScriptController@analyticSetup')->name('analytic');
-                    Route::post('analytic-setup-update', 'Marketing\AnalyticScriptController@analyticUpdate')->name('analyticUpdate');
-                    Route::get('analytic-status', 'Marketing\AnalyticScriptController@analyticStatus')->name('analyticStatus');
+            Route::group(['prefix' => 'marketing', 'as' => 'marketing.'], function () {
+                Route::get('analytic-setup', 'Marketing\AnalyticScriptController@analyticSetup')->name('analytic');
+                Route::post('analytic-setup-update', 'Marketing\AnalyticScriptController@analyticUpdate')->name('analyticUpdate');
+                Route::get('analytic-status', 'Marketing\AnalyticScriptController@analyticStatus')->name('analyticStatus');
             });
 
-           //openAI
+            //openAI
             Route::get('open-ai', 'BusinessSettingsController@openAI')->name('openAI');
             Route::get('open-ai-settings', 'BusinessSettingsController@openAISettings')->name('openAISettings');
             Route::put('open-ai-settings-update', 'BusinessSettingsController@openAISettingsUpdate')->name('openAISettingsUpdate');
@@ -441,7 +464,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('notification-status-change/{key}/{user_type}/{type}', 'BusinessSettingsController@notification_status_change')->name('notification_status_change');
 
 
-
             Route::group(['prefix' => 'file-manager', 'as' => 'file-manager.'], function () {
                 Route::get('/download/{file_name}/{storage?}', 'FileManagerController@download')->name('download');
                 Route::get('/index/{folder_path?}/{storage?}', 'FileManagerController@index')->name('index');
@@ -491,7 +513,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('/offline-payment/status/{id}', 'OfflinePaymentMethodController@status')->name('offline.status');
 
 
-
             //db clean
             Route::get('db-index', 'DatabaseSettingController@db_index')->name('db-index');
             Route::post('db-clean', 'DatabaseSettingController@clean_db')->name('clean-db');
@@ -521,7 +542,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('automated-message/status/{id}/{status}', 'AutomatedMessageController@status')->name('automated_message.status');
             Route::delete('automated-message/destroy/{id}', 'AutomatedMessageController@destroy')->name('automated_message.destroy');
 
-            Route::group(['namespace' => 'System','prefix' => 'system-addon', 'as' => 'system-addon.', 'middleware'=>['module:user_management']], function () {
+            Route::group(['namespace' => 'System', 'prefix' => 'system-addon', 'as' => 'system-addon.', 'middleware' => ['module:user_management']], function () {
                 Route::get('/', 'AddonController@index')->name('index');
                 Route::post('publish', 'AddonController@publish')->name('publish');
                 Route::post('activation', 'AddonController@activation')->name('activation');
@@ -533,7 +554,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
         // Subscribed customer Routes
         Route::group(['prefix' => 'customer', 'as' => 'customer.'], function () {
-
 
 
             Route::group(['prefix' => 'wallet', 'as' => 'wallet.', 'middleware' => ['module:customer_wallet']], function () {

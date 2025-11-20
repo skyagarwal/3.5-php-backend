@@ -80,7 +80,7 @@ class OrderController extends Controller
         })
         ->when($status == 'all', function($query){
             return $query->where(function($query){
-                $query->whereNotIn('order_status',(config('order_confirmation_model') == 'store'|| Helpers::get_store_data()->sub_self_delivery)?['failed','canceled', 'refund_requested', 'refunded']:['pending','failed','canceled', 'refund_requested', 'refunded'])
+                $query->whereNotIn('order_status',(config('order_confirmation_model') == 'store'|| Helpers::get_store_data()->sub_self_delivery)?['failed','canceled', 'refund_requested', 'refunded']:[ 'accepted' ,'pending','failed','canceled', 'refund_requested', 'refunded'])
                 ->orWhere(function($query){
                     return $query->where('order_status','pending')->where('order_type', 'take_away');
                 });

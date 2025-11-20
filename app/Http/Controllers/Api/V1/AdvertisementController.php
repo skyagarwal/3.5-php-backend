@@ -24,10 +24,11 @@ class AdvertisementController extends Controller
                     $query->where('module_id', config('module.current_module_data')['id']);
                 })
                 ->with('store')
-                ->when(count($zone_ids) > 0, function($query) use($zone_ids) {
-                    $query->whereHas('store', function($query) use($zone_ids){
+                ->whereHas('store', function ($query) use ($zone_ids) {
+                    if (!empty($zone_ids)) {
                         $query->whereIn('zone_id', $zone_ids);
-                    });
+                    }
+                    $query->active();
                 })
                 ->orderByRaw('ISNULL(priority), priority ASC')
                 ->get();

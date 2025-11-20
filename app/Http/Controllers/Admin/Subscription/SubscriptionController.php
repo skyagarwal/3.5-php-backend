@@ -271,7 +271,7 @@ class SubscriptionController extends Controller
 
     private function packageOverview($subscriptionackage,$type ='all'){
         $data=[];
-        $subscription_deadline_warning_days = BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
+        $subscription_deadline_warning_days = (int) BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
 
         $totalSubscribersData = $subscriptionackage->subscribers()
         ->when($type == 'this_month' ,function($query){
@@ -466,7 +466,7 @@ class SubscriptionController extends Controller
         ->latest()->paginate(config('default_pagination'));
 
         $data=[];
-        $subscription_deadline_warning_days = BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
+        $subscription_deadline_warning_days = (int) BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
 
         $totalSubscribersData= StoreSubscription::whereHas('store',function ($query)use($request){
             $query->whereIn('store_business_model' ,['subscription','unsubscribed'])

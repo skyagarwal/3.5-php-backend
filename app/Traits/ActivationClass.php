@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+// use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 trait ActivationClass
@@ -111,6 +112,9 @@ trait ActivationClass
 
     public function updateActivationConfig($app, $response): void
     {
+        if('admin.business-settings.addon-activation.index' === \Illuminate\Support\Facades\Route::currentRouteName() ){
+            return;
+        }
         $config = $this->getAddonsConfig();
         $config[$app] = $response;
         $configContents = "<?php return " . var_export($config, true) . ";";

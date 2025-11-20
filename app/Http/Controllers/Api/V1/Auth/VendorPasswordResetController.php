@@ -36,7 +36,13 @@ class VendorPasswordResetController extends Controller
                 'created_at' => now(),
             ]);
             if (config('mail.status')) {
-                Mail::to($vendor['email'])->send(new \App\Mail\PasswordResetMail($token));
+                try {
+                    Mail::to($vendor['email'])->send(new \App\Mail\PasswordResetMail($token));
+                } catch (\Throwable $th) {
+                  return response()->json(['errors' => [
+                        ['code' => 'not-found', 'message' => 'Failed to send email.']
+                    ]], 403);
+                }
             }
             return response()->json(['message' => 'Email sent successfully.'], 200);
         }

@@ -174,7 +174,7 @@ $(".js-select2-custom").each(function () {
 $("#delivery_address").on("click", function () {
     initMap();
 });
-initMap();
+// initMap();
 $("#customer").change(function () {
     if ($(this).val()) {
         $("#customer_id").val($(this).val());

@@ -324,6 +324,166 @@
             </div>
         </div>
     </div>
+
+
+<!-- global guideline view Offcanvas here -->
+<div id="global_guideline_offcanvas" class="custom-offcanvas d-flex flex-column justify-content-between">
+    <form action="{{ route('taxvat.store') }}" method="post">
+        <div>
+            <div class="custom-offcanvas-header bg--secondary d-flex justify-content-between align-items-center px-3 py-3">
+                <div class="py-1">
+                    <h3 class="mb-0 line--limit-1">{{ translate('messages.Create Tax Guideline') }}</h3>
+                </div>
+                <button type="button" class="btn-close w-25px h-25px border rounded-circle d-center bg--secondary text-dark offcanvas-close fz-15px p-0"aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="custom-offcanvas-body custom-offcanvas-body-100  p-20">
+                <div class="">
+                    <div class="py-3 px-3 bg-light rounded mb-3">
+                        <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                            <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapse show" type="button"
+                                    data-toggle="collapse" data-target="#collapseGeneralSetup_01" aria-expanded="true">
+                                <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1">
+                                    <i class="tio-down-ui top-01 color-656566"></i>
+                                </div>
+                                <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('What is Tax ?') }}</span>
+                            </button>
+                            <a href="javascript:void(0)" class="fs-12 text-nowrap theme-clr text-underline">
+                                {{translate('Let’s Setup')}}
+                            </a>
+                        </div>
+                        <div class="collapse mt-3 show" id="collapseGeneralSetup_01">
+                            <div class="card rounded border p-3 card-body">
+                                <div class="mb-3">
+                                    <p class="m-1 fs-12 color-656566">
+                                        Tax is a mandatory government charge applied to each sale your business makes.
+                                    </p>
+                                    <p class="m-0 fs-12 color-656566">
+                                        It’s collected from the customer and later paid to the government according to local regulations.
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Common types include')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('VAT (Value Added Tax)')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('GST (Goods & Services Tax)')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Service Tax')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Sales Tax')}}</li>
+                                    </ul>
+                                </div>
+                                <p class="m-0 fs-12 color-656566">
+                                    <strong>Tips:</strong> The exact type and percentage depend on the laws of your country or region.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                        <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                            <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                    data-toggle="collapse" data-target="#collapseGeneralSetup_032" aria-expanded="true">
+                                <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                    <i class="tio-down-ui top-01 color-656566"></i>
+                                </div>
+                                <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Why Set Up Taxes ?') }}</span>
+                            </button>
+                        </div>
+                        <div class="collapse mt-3" id="collapseGeneralSetup_032">
+                            <div class="card rounded border p-3 card-body">                                
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Enabling tax in your system helps you:')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('Stay legally compliant with local tax laws')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Automatically calculate and apply the correct tax during checkout')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Show clear and accurate pricing to customers')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Show clear and accurate pricing to customers')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Generate ready-to-use VAT/GST reports')}}</li>
+                                    </ul>
+                                </div>
+                                <p class="m-0 fs-12 color-656566">
+                                    {{ translate('Once you set up your tax correctly, the system will automatically handle calculations for every order.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                        <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                            <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                    data-toggle="collapse" data-target="#collapseGeneralSetup_033" aria-expanded="true">
+                                <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                    <i class="tio-down-ui top-01 color-656566"></i>
+                                </div>
+                                <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Follow these steps to add a new tax rate:') }}</span>
+                            </button>
+                        </div>
+                        <div class="collapse mt-3" id="collapseGeneralSetup_033">
+                            <div class="card rounded border p-3 card-body">   
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Activate the Tax Status')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('Turn ON the Status toggle to make the tax active.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('If it’s OFF, the tax will be saved but not applied to any transaction.')}}</li>
+                                    </ul>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Enter a Tax Name')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('Go to the Tax Name field and enter your preferred name.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Example: Service Tax, VAT, GST, Sales Tax, etc.')}}</li>
+                                    </ul>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Set the Tax Rate')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('In the Tax Rate box, enter the percentage (e.g., 10%).')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('This is the rate that will be applied to all taxable items or services.')}}</li>
+                                    </ul>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Save the Tax')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('Click Submit to add the new tax.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Click Reset if you need to clear the form before saving.')}}</li>
+                                    </ul>
+                                </div>
+                                <p class="m-0 fs-12 color-656566">
+                                    {{ translate('You can create multiple taxes for different purposes — for example, separate ones for product, service, and delivery.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                        <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                            <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                    data-toggle="collapse" data-target="#collapseGeneralSetup_044" aria-expanded="true">
+                                <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                    <i class="tio-down-ui top-01 color-656566"></i>
+                                </div>
+                                <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Edit or Manage Existing Taxes') }}</span>
+                            </button>
+                        </div>
+                        <div class="collapse mt-3" id="collapseGeneralSetup_044">
+                            <div class="card rounded border p-3 card-body">   
+                                <div class="mb-3">
+                                    <h6 class="mb-2 fs-12 color-656566">{{translate('Edit or Manage Existing Taxes')}}</h6>
+                                    <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                        <li class="fs-12 color-656566">{{translate('Once a tax is created, you cannot change its name or delete it (for data integrity).')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('However, you can update the tax rate anytime if your government updates the tax percentage.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Manage all your created taxes easily from the Tax List page.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Use the Export button to download a copy for backup or accounting records.')}}</li>
+                                        <li class="fs-12 color-656566">{{translate('Toggle the Status on or off to quickly enable or disable a tax.')}}</li>
+                                    </ul>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="offcanvasOverlay" class="offcanvas-overlay"></div>
+<!-- global guideline view Offcanvas end -->
 @endsection
 
 @push('script_2')

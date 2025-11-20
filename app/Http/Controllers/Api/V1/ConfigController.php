@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Setting;
-use App\Models\Zone;
-use App\Models\Module;
-use App\Models\Currency;
-use App\Models\DMVehicle;
-use App\Models\DataSetting;
-use App\Models\SocialMedia;
-use App\Traits\AddonHelper;
-use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
-use App\Models\BusinessSetting;
-use App\Models\ReactTestimonial;
-use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use App\Models\AnalyticScript;
-use App\Models\OfflinePaymentMethod;
-use Illuminate\Support\Facades\Http;
+use App\Models\BusinessSetting;
+use App\Models\Currency;
+use App\Models\DataSetting;
+use App\Models\DMVehicle;
+use App\Models\FAQ;
 use App\Models\FlutterSpecialCriteria;
+use App\Models\Module;
+use App\Models\OfflinePaymentMethod;
 use App\Models\ParcelCancellationReason;
+use App\Models\ReactPromotionalBanner;
+use App\Models\ReactTestimonial;
+use App\Models\Setting;
+use App\Models\SocialMedia;
+use App\Models\Zone;
+use App\Traits\AddonHelper;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use MatanYadaev\EloquentSpatial\Objects\Point;
@@ -32,7 +34,7 @@ class ConfigController extends Controller
 
     use AddonHelper;
 
-    function __construct()
+    public function __construct()
     {
         $map_api_key_server = BusinessSetting::where(['key' => 'map_api_key_server'])->first();
         $map_api_key_server = $map_api_key_server ? $map_api_key_server->value : null;
@@ -155,7 +157,6 @@ class ConfigController extends Controller
 
         $drivemondExternalSetting = false;
 
-
         $cacheKey = 'business_settings_config_keys';
         $settings = Cache::rememberForever($cacheKey, function () use ($key) {
             return array_column(BusinessSetting::whereIn('key', $key)->get()->toArray(), 'value', 'key');
@@ -170,7 +171,7 @@ class ConfigController extends Controller
             });
         }
 
-        $DataSetting = Cache::rememberForever("data_settings_flutter_landing_page", function () {
+        $DataSetting = Cache::rememberForever('data_settings_flutter_landing_page', function () {
             return DataSetting::where('type', 'flutter_landing_page')
                 ->where('key', 'download_user_app_links')
                 ->pluck('value', 'key')
@@ -183,7 +184,7 @@ class ConfigController extends Controller
         $landing_page_links['app_url_ios_status'] = data_get($DataSetting, 'apple_store_url_status', null);
         $landing_page_links['app_url_ios'] = data_get($DataSetting, 'apple_store_url', null);
 
-        $currency_symbol = Cache::rememberForever("business_settings_currency_symbol", function () {
+        $currency_symbol = Cache::rememberForever('business_settings_currency_symbol', function () {
             return Currency::where(['currency_code' => Helpers::currency_code()])->first()->currency_symbol;
         });
         $cod = json_decode($settings['cash_on_delivery'], true);
@@ -191,14 +192,13 @@ class ConfigController extends Controller
         $default_location = isset($settings['default_location']) ? json_decode($settings['default_location'], true) : 0;
 
         $admin_free_delivery = [
-            'status' => (bool) data_get($settings, 'admin_free_delivery_status', 0),
+            'status' => (bool)data_get($settings, 'admin_free_delivery_status', 0),
             'type' => data_get($settings, 'admin_free_delivery_option'),
-            'free_delivery_over' => (float) data_get($settings, 'free_delivery_over', 0)
+            'free_delivery_over' => (float)data_get($settings, 'free_delivery_over', 0),
         ];
 
-
         $additional_charge = isset($settings['additional_charge']) ? (float)$settings['additional_charge'] : 0;
-        $module = Cache::rememberForever("module_config", function () {
+        $module = Cache::rememberForever('module_config', function () {
             return Module::active()->count() == 1 ? Module::active()->first() : null;
         });
         $languages = Helpers::get_business_settings('language');
@@ -206,7 +206,7 @@ class ConfigController extends Controller
         foreach ($languages as $language) {
             array_push($lang_array, [
                 'key' => $language,
-                'value' => Helpers::get_language_name($language)
+                'value' => Helpers::get_language_name($language),
             ]);
         }
         $system_languages = Helpers::get_business_settings('system_language');
@@ -216,14 +216,14 @@ class ConfigController extends Controller
                 'key' => $language['code'],
                 'value' => Helpers::get_language_name($language['code']),
                 'direction' => $language['direction'],
-                'default' => $language['default']
+                'default' => $language['default'],
             ]);
         }
         $social_login = [];
         foreach (Helpers::get_business_settings('social_login') as $social) {
             $config = [
                 'login_medium' => $social['login_medium'],
-                'status' => (bool)$social['status']
+                'status' => (bool)$social['status'],
             ];
             array_push($social_login, $config);
         }
@@ -243,7 +243,7 @@ class ConfigController extends Controller
             }
         }
 
-        //addon settings publish status
+        // addon settings publish status
         $published_status = 0; // Set a default value
         $payment_published_status = config('get_payment_publish_status');
         if (isset($payment_published_status[0]['is_published'])) {
@@ -252,30 +252,30 @@ class ConfigController extends Controller
 
         $active_addon_payment_lists = $published_status == 1 ? $this->getPaymentMethods() : $this->getDefaultPaymentMethods();
 
-        $digital_payment_infos = array(
+        $digital_payment_infos = [
             'digital_payment' => (bool)($digital_payment['status'] == 1 ? true : false),
             'plugin_payment_gateways' => (bool)($published_status ? true : false),
-            'default_payment_gateways' => (bool)($published_status ? false : true)
-        );
+            'default_payment_gateways' => (bool)($published_status ? false : true),
+        ];
 
         if (data_get($settings, 'subscription_free_trial_type') == 'year') {
             $trial_period = data_get($settings, 'subscription_free_trial_days') > 0 ? data_get($settings, 'subscription_free_trial_days') / 365 : 0;
-        } else if (data_get($settings, 'subscription_free_trial_type') == 'month') {
+        } elseif (data_get($settings, 'subscription_free_trial_type') == 'month') {
             $trial_period = data_get($settings, 'subscription_free_trial_days') > 0 ? data_get($settings, 'subscription_free_trial_days') / 30 : 0;
         } else {
             $trial_period = data_get($settings, 'subscription_free_trial_days') > 0 ? data_get($settings, 'subscription_free_trial_days') : 0;
         }
 
         if (addon_published_status('Rental')) {
-            $cache_dis_key_min = "vehicle_dis_min_price_conf";
+            $cache_dis_key_min = 'vehicle_dis_min_price_conf';
             $vehicle_distance_min = Cache::rememberForever($cache_dis_key_min, function () {
                 return Vehicle::where('distance_price', '>', '0')->min('distance_price');
             });
-            $cache_hour_key_min = "vehicle_hour_min_price_conf";
+            $cache_hour_key_min = 'vehicle_hour_min_price_conf';
             $vehicle_hourly_min = Cache::rememberForever($cache_hour_key_min, function () {
                 return Vehicle::where('hourly_price', '>', '0')->min('hourly_price');
             });
-            $cache_day_wise_key_min = "vehicle_day_wise_min_price_conf";
+            $cache_day_wise_key_min = 'vehicle_day_wise_min_price_conf';
             if (Schema::hasColumn('vehicles', 'day_wise_price')) {
                 $vehicle_day_wise_min = Cache::rememberForever($cache_day_wise_key_min, function () {
                     return Vehicle::where('day_wise_price', '>', '0')->min('day_wise_price');
@@ -283,9 +283,8 @@ class ConfigController extends Controller
             }
         }
         if (addon_published_status('TaxModule')) {
-            $systemTax =  \Modules\TaxModule\Entities\SystemTaxSetup::where('is_active', 1)->where('is_default', 1)->first();
+            $systemTax = \Modules\TaxModule\Entities\SystemTaxSetup::where('is_active', 1)->where('is_default', 1)->first();
         }
-
 
         return response()->json([
             'business_name' => $settings['business_name'],
@@ -345,7 +344,7 @@ class ConfigController extends Controller
             'fav_icon' => $settings['icon'],
             'fav_icon_full_url' => Helpers::get_full_url('business', $settings['icon'], $data['icon_storage'] ?? 'public'),
             'landing_page_links' => $landing_page_links,
-            //Added Business Setting
+            // Added Business Setting
             'dm_tips_status' => (int)(isset($settings['dm_tips_status']) ? $settings['dm_tips_status'] : 0),
             'loyalty_point_exchange_rate' => (int)(isset($settings['loyalty_point_item_purchase_point']) ? $settings['loyalty_point_exchange_rate'] : 0),
             'loyalty_point_item_purchase_point' => (float)(isset($settings['loyalty_point_item_purchase_point']) ? $settings['loyalty_point_item_purchase_point'] : 0.0),
@@ -394,9 +393,9 @@ class ConfigController extends Controller
             'subscription_free_trial_type' => (isset($settings['subscription_free_trial_type']) ? $settings['subscription_free_trial_type'] : 'day'),
             'subscription_free_trial_status' => (int)(isset($settings['subscription_free_trial_status']) ? $settings['subscription_free_trial_status'] : 0),
             'country_picker_status' => (int)(isset($settings['country_picker_status']) ? $settings['country_picker_status'] : 1),
-            'external_system' => $drivemondExternalSetting,
-            'drivemond_app_url_android' => $drivemondExternalSetting ? Helpers::get_external_data('drivemond_app_url_android') : '',
-            'drivemond_app_url_ios' => $drivemondExternalSetting ? Helpers::get_external_data('drivemond_app_url_ios') : '',
+            // 'external_system' => $drivemondExternalSetting,
+            // 'drivemond_app_url_android' => $drivemondExternalSetting ? Helpers::get_external_data('drivemond_app_url_android') : '',
+            // 'drivemond_app_url_ios' => $drivemondExternalSetting ? Helpers::get_external_data('drivemond_app_url_ios') : '',
             'firebase_otp_verification' => (int)(isset($settings['firebase_otp_verification']) ? $settings['firebase_otp_verification'] : 0),
             'centralize_login' => [
                 'manual_login_status' => (int)(isset($settings['manual_login_status']) ? $settings['manual_login_status'] : 0),
@@ -409,14 +408,14 @@ class ConfigController extends Controller
                 'phone_verification_status' => (int)(isset($settings['phone_verification_status']) ? $settings['phone_verification_status'] : 0),
             ],
 
-            'vehicle_distance_min' => (float) $vehicle_distance_min ?? 0,
-            'vehicle_hourly_min' => (float) $vehicle_hourly_min ?? 0,
-            'vehicle_day_wise_min' => (float) $vehicle_day_wise_min ?? 0,
+            'vehicle_distance_min' => (float)$vehicle_distance_min ?? 0,
+            'vehicle_hourly_min' => (float)$vehicle_hourly_min ?? 0,
+            'vehicle_day_wise_min' => (float)$vehicle_day_wise_min ?? 0,
             'admin_free_delivery' => $admin_free_delivery,
-            'is_sms_active' =>  (bool)  Setting::whereJsonContains('live_values->status', '1')->where('settings_type', 'sms_config')->exists(),
-            'is_mail_active' =>  (bool)config('mail.status'),
+            'is_sms_active' => (bool)Setting::whereJsonContains('live_values->status', '1')->where('settings_type', 'sms_config')->exists(),
+            'is_mail_active' => (bool)config('mail.status'),
             'system_tax_type' => $systemTax?->tax_type ?? null,
-            'system_tax_include_status' => (int) $systemTax?->is_included,
+            'system_tax_include_status' => (int)$systemTax?->is_included,
 
             'parcel_cancellation_status' => (int)(1),
             'parcel_cancellation_basic_setup' => isset($settings['parcel_cancellation_basic_setup']) ? json_decode($settings['parcel_cancellation_basic_setup']) : null,
@@ -449,8 +448,8 @@ class ConfigController extends Controller
         if (count($zones) < 1) {
             return response()->json([
                 'errors' => [
-                    ['code' => 'coordinates', 'message' => translate('messages.service_not_available_in_this_area')]
-                ]
+                    ['code' => 'coordinates', 'message' => translate('messages.service_not_available_in_this_area')],
+                ],
             ], 404);
         }
         $data = array_filter($zones->toArray(), function ($zone) {
@@ -465,8 +464,8 @@ class ConfigController extends Controller
 
         return response()->json([
             'errors' => [
-                ['code' => 'coordinates', 'message' => translate('messages.we_are_temporarily_unavailable_in_this_area')]
-            ]
+                ['code' => 'coordinates', 'message' => translate('messages.we_are_temporarily_unavailable_in_this_area')],
+            ],
         ], 403);
     }
 
@@ -481,14 +480,14 @@ class ConfigController extends Controller
         }
 
         $apiKey = $this->map_api_key;
-        $url = "https://places.googleapis.com/v1/places:autocomplete";
+        $url = 'https://places.googleapis.com/v1/places:autocomplete';
         $data = [
-            "input" => $request['search_text'],
-            "languageCode" => app()->getLocale(),
+            'input' => $request['search_text'],
+            'languageCode' => app()->getLocale(),
         ];
 
         $headers = [
-            "Content-Type: application/json",
+            'Content-Type: application/json',
             "X-Goog-Api-Key: $apiKey",
         ];
 
@@ -503,7 +502,6 @@ class ConfigController extends Controller
 
         return json_decode($response, true);
     }
-
 
     public function distance_api(Request $request)
     {
@@ -520,23 +518,23 @@ class ConfigController extends Controller
         }
 
         $apiKey = $this->map_api_key;
-        $url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix";
+        $url = 'https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix';
 
         $data = [
-            "origins" => [
-                ["waypoint" => ["location" => ["latLng" => ["latitude" => $request['origin_lat'], "longitude" => $request['origin_lng']]]]]
+            'origins' => [
+                ['waypoint' => ['location' => ['latLng' => ['latitude' => $request['origin_lat'], 'longitude' => $request['origin_lng']]]]],
             ],
-            "destinations" => [
-                ["waypoint" => ["location" => ["latLng" => ["latitude" => $request['destination_lat'], "longitude" => $request['destination_lng']]]]],
+            'destinations' => [
+                ['waypoint' => ['location' => ['latLng' => ['latitude' => $request['destination_lat'], 'longitude' => $request['destination_lng']]]]],
             ],
-            "travelMode" =>  $request['mode'] ?? 'WALK',
+            'travelMode' => $request['mode'] ?? 'WALK',
             // "routingPreference" => "TRAFFIC_AWARE"
         ];
 
         $headers = [
-            "Content-Type: application/json",
+            'Content-Type: application/json',
             "X-Goog-Api-Key: $apiKey",
-            "X-Goog-FieldMask: duration,distanceMeters,localizedValues"
+            'X-Goog-FieldMask: duration,distanceMeters,localizedValues',
         ];
 
         $ch = curl_init();
@@ -548,9 +546,9 @@ class ConfigController extends Controller
 
         $response = curl_exec($ch);
         curl_close($ch);
+
         return json_decode($response, true)[0];
     }
-
 
     public function place_api_details(Request $request)
     {
@@ -591,6 +589,7 @@ class ConfigController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
         $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' . $request->lat . ',' . $request->lng . '&key=' . $this->map_api_key);
+
         return $response->json();
     }
 
@@ -609,9 +608,10 @@ class ConfigController extends Controller
             'delivery_service_section',
             'hero_section',
             'download_app_section',
-            'landing_page_text'
+            'landing_page_text',
         ];
         $settings = array_column(BusinessSetting::whereIn('key', $key)->get()->toArray(), 'value', 'key');
+
         return response()->json(
             [
                 'react_header_banner' => (isset($settings['react_header_banner'])) ? $settings['react_header_banner'] : null,
@@ -649,12 +649,14 @@ class ConfigController extends Controller
             })->orderBy('starting_coverage_area')->first();
 
         $extra_charges = (float)(isset($data) ? $data->extra_charges : 0);
+
         return response()->json($extra_charges, 200);
     }
 
     public function get_vehicles(Request $request)
     {
         $data = DMVehicle::active()->get(['id', 'type']);
+
         return response()->json($data, 200);
     }
 
@@ -694,80 +696,223 @@ class ConfigController extends Controller
         $awsUrl = config('filesystems.disks.s3.url');
         $awsBucket = config('filesystems.disks.s3.bucket');
         $awsBaseURL = rtrim($awsUrl, '/') . '/' . ltrim($awsBucket . '/');
-
         $promotional_banners = [];
-        foreach (json_decode($settings['promotion_banner'], true) as $value) {
-            $promotional_banners[] = Helpers::get_full_url('promotional_banner', $value['img'], $value['storage'] ?? 'public');
+        $promotional_banners_data = ReactPromotionalBanner::where('status', 1)->get();
+        foreach ($promotional_banners_data as $value) {
+            $promotional_banners[] = Helpers::get_full_url('promotional_banner', $value->image, 'public');
         }
 
         $zones = Zone::where('status', 1)->get();
         $zones = self::zone_format($zones);
 
+        $heroSection = [
+            'header_title' => (isset($settings['header_title'])) ? $settings['header_title'] : null,
+            'header_sub_title' => (isset($settings['header_sub_title'])) ? $settings['header_sub_title'] : null,
+            'header_tag_line' => (isset($settings['header_tag_line'])) ? $settings['header_tag_line'] : null,
+            'pick_location_title' => (isset($settings['pick_location_title'])) ? $settings['pick_location_title'] : null,
+        ];
+        $trustSection = [
+            'trust_section_status' => (isset($settings['trust_section_status'])) ? (int)$settings['trust_section_status'] : 0,
+            'cards' => [],
+        ];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $trustSection['cards'][] = [
+                'status' => (int)($settings["trust_status_card_{$i}"] ?? 0),
+                'title' => $settings["trust_title_card_{$i}"] ?? null,
+                'sub_title' => $settings["trust_sub_title_card_{$i}"] ?? null,
+                'image_full_url' => Helpers::get_full_url(
+                    'trust_section',
+                    $settings["trust_image_card_{$i}"] ?? null,
+                    $settings["trust_image_card_{$i}_storage"] ?? 'public'
+                ),
+            ];
+        }
+
+        $availableZoneSection = [
+            'available_zone_status' => (int)((isset($settings['available_zone_status'])) ? $settings['available_zone_status'] : 0),
+            'available_zone_title' => (isset($settings['available_zone_title'])) ? $settings['available_zone_title'] : null,
+            'available_zone_short_description' => (isset($settings['available_zone_short_description'])) ? $settings['available_zone_short_description'] : null,
+            'available_zone_list' => $zones,
+        ];
+        $promotionalBannerSection = [
+            'promotion_banner_section_status' => (int)((isset($settings['promotional_banner_section_status'])) ? $settings['promotional_banner_section_status'] : 0),
+            'promotion_banners_full_url' => $promotional_banners ?? [],
+        ];
+
+        $userAppDownloadSection = [
+            'download_user_app_section_status' => (int)((isset($settings['download_user_app_section_status'])) ? $settings['download_user_app_section_status'] : 0),
+            'download_user_app_title' => (isset($settings['download_user_app_title'])) ? $settings['download_user_app_title'] : null,
+            'download_user_app_sub_title' => (isset($settings['download_user_app_sub_title'])) ? $settings['download_user_app_sub_title'] : null,
+            'download_user_app_image_full_url' => Helpers::get_full_url('download_user_app_image', (isset($settings['download_user_app_image'])) ? $settings['download_user_app_image'] : null, isset($settings['download_user_app_image_storage']) ? $settings['download_user_app_image_storage'] : 'public'),
+            'download_user_app_button_title' => (isset($settings['download_user_app_button_title'])) ? $settings['download_user_app_button_title'] : null,
+            'download_user_app_button_sub_title' => (isset($settings['download_user_app_button_sub_title'])) ? $settings['download_user_app_button_sub_title'] : null,
+            'download_user_app_links' => (isset($settings['download_user_app_links'])) ? json_decode($settings['download_user_app_links'], true) : null,
+            'download_business_app_links' => (isset($settings['download_business_app_links'])) ? json_decode($settings['download_business_app_links'], true) : null,
+        ];
+
+        $popularClientSection = [
+            'popular_client_section_status' => (isset($settings['popular_client_section_status'])) ? (int)$settings['popular_client_section_status'] : 0,
+            'popular_client_title' => (isset($settings['popular_client_title'])) ? $settings['popular_client_title'] : null,
+            'popular_client_sub_title' => (isset($settings['popular_client_sub_title'])) ? $settings['popular_client_sub_title'] : null
+        ];
+        $popularClientImage= DataSetting::where('key', 'popular_client_image')->whereNotNull('value')->where('value','!=',0)->select('value')->get();
+        foreach ($popularClientImage as $image) {
+            $settings["popular_client_image"] = $image->value;
+            $popularClientSection['cards'][] = [
+                'image_full_url' => Helpers::get_full_url(
+                    'popular_client_section',
+                    $settings["popular_client_image"] ?? null,
+                    $settings["popular_client_image_storage"] ?? 'public'
+                ),
+            ];
+        }
+
+        $sellerAppDownloadSection = [
+            'download_seller_app_section_status' => (int)((isset($settings['download_seller_app_section_status'])) ? $settings['download_seller_app_section_status'] : 0),
+            'download_seller_app_title' => (isset($settings['download_seller_app_title'])) ? $settings['download_seller_app_title'] : null,
+            'download_seller_app_sub_title' => (isset($settings['download_seller_app_sub_title'])) ? $settings['download_seller_app_sub_title'] : null,
+            'download_seller_app_content_button_title' => (isset($settings['download_seller_app_button_title'])) ? $settings['download_seller_app_button_title'] : null,
+            'download_seller_app_image_full_url' => Helpers::get_full_url('download_seller_app_section', (isset($settings['download_seller_app_image'])) ? $settings['download_seller_app_image'] : null, isset($settings['download_seller_app_image_storage']) ? $settings['download_seller_app_image_storage'] : 'public'),
+            'download_seller_app_button_title' => (isset($settings['download_seller_app_main_button_title'])) ? $settings['download_seller_app_main_button_title'] : null,
+            'download_seller_app_button_sub_title' => (isset($settings['download_seller_app_main_button_sub_title'])) ? $settings['download_seller_app_main_button_sub_title'] : null,
+            'download_seller_app_links' => (isset($settings['download_seller_app_links'])) ? json_decode($settings['download_seller_app_links'], true) : null,
+            'download_business_app_links' => (isset($settings['download_business_app_links'])) ? json_decode($settings['download_business_app_links'], true) : null,
+        ];
+
+        $deliverymanAppDownloadSection = [
+            'download_deliveryman_app_section_status' => (int)((isset($settings['download_dm_app_section_status'])) ? $settings['download_dm_app_section_status'] : 0),
+            'download_dm_app_title' => (isset($settings['download_dm_app_title'])) ? $settings['download_dm_app_title'] : null,
+            'download_dm_app_sub_title' => (isset($settings['download_dm_app_sub_title'])) ? $settings['download_dm_app_sub_title'] : null,
+            'download_dm_app_content_button_title' => (isset($settings['download_dm_app_button_title'])) ? $settings['download_dm_app_button_title'] : null,
+            'download_dm_app_image_full_url' => Helpers::get_full_url('download_dm_app_section', (isset($settings['download_dm_app_image'])) ? $settings['download_dm_app_image'] : null, isset($settings['download_dm_app_image_storage']) ? $settings['download_dm_app_image_storage'] : 'public'),
+            'download_dm_app_button_title' => (isset($settings['download_dm_app_main_button_title'])) ? $settings['download_dm_app_main_button_title'] : null,
+            'download_dm_app_button_sub_title' => (isset($settings['download_dm_app_main_button_sub_title'])) ? $settings['download_dm_app_main_button_sub_title'] : null,
+            'download_dm_app_links' => (isset($settings['download_dm_app_links'])) ? json_decode($settings['download_dm_app_links'], true) : null,
+            'download_business_app_links' => (isset($settings['download_business_app_links'])) ? json_decode($settings['download_business_app_links'], true) : null,
+        ];
+
+        $bannerSection = [
+            'banner_section_status' => (int)((isset($settings['banner_section_status'])) ? $settings['banner_section_status'] : 0),
+            'banner_iamge_full_url' => Helpers::get_full_url('banner_section', (isset($settings['banner'])) ? $settings['banner'] : null, isset($settings['banner_storage']) ? $settings['banner_storage'] : 'public'),
+        ];
+
+        $testimonialSection = [
+            'testimonial_section_status' => (int)((isset($settings['testimonial_section_status'])) ? $settings['testimonial_section_status'] : 0),
+            'testimonial_title' => (isset($settings['testimonial_title'])) ? $settings['testimonial_title'] : null,
+            'testimonial_sub_title' => (isset($settings['testimonial_sub_title'])) ? $settings['testimonial_sub_title'] : null,
+            'testimonial_button_title' => (isset($settings['testimonial_button_title'])) ? $settings['testimonial_button_title'] : null,
+            'testimonial_list' => (isset($reviews)) ? $reviews : null,
+        ];
+
+        $gallerySection = [
+            'gallery_section_status' => (int)((isset($settings['gallery_section_status'])) ? $settings['gallery_section_status'] : 0),
+            'gallery_content_title' => (isset($settings['gallery_content_title'])) ? $settings['gallery_content_title'] : null,
+            'gallery_content_sub_title' => (isset($settings['gallery_content_sub_title'])) ? $settings['gallery_content_sub_title'] : null,
+        ];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $gallerySection['cards'][] = [
+                'status' => (int)((isset($settings["gallery_image_{$i}_status"])) ? $settings["gallery_image_{$i}_status"] : 0),
+                'image_full_url' => Helpers::get_full_url(
+                    'gallery_section',
+                    $settings["gallery_image_{$i}"] ?? null,
+                    $settings["gallery_image_{$i}_storage"] ?? 'public'
+                ),
+            ];
+        }
+
+        $highlightSection = [
+            'highlight_section_status' => (int)((isset($settings['highlight_section_status'])) ? $settings['highlight_section_status'] : 0),
+            'highlight_title' => (isset($settings['highlight_title'])) ? $settings['highlight_title'] : null,
+            'highlight_sub_title' => (isset($settings['highlight_sub_title'])) ? $settings['highlight_sub_title'] : null,
+            'highlight_button_title' =>  null,
+            'highlight_image_full_url' => Helpers::get_full_url('highlight_section', (isset($settings['highlight_image'])) ? $settings['highlight_image'] : null, isset($settings['highlight_image_storage']) ? $settings['highlight_image_storage'] : 'public'),
+
+        ];
+
+        $faqs = FAQ::get();
+
+        $faqSection = [
+            'faq_section_status' => (int)((isset($settings['faq_section_status'])) ? $settings['faq_section_status'] : 0),
+            'faq_title' => (isset($settings['faq_title'])) ? $settings['faq_title'] : null,
+            'faq_list' => (isset($faqs)) ? $faqs : null,
+        ];
+
+        $footerSection = [
+            'fixed_newsletter_title' => (isset($settings['fixed_newsletter_title'])) ? $settings['fixed_newsletter_title'] : null,
+            'fixed_newsletter_sub_title' => (isset($settings['fixed_newsletter_sub_title'])) ? $settings['fixed_newsletter_sub_title'] : null,
+            'fixed_footer_description' => (isset($settings['fixed_footer_description'])) ? $settings['fixed_footer_description'] : null,
+            'fixed_promotional_banner_full_url' => Helpers::get_full_url('promotional_banner', (isset($settings['fixed_promotional_banner'])) ? $settings['fixed_promotional_banner'] : null, (isset($settings['fixed_promotional_banner_storage'])) ? $settings['fixed_promotional_banner_storage'] : 'public'),
+        ];
+
+        $companyIntroSection = [
+            'company_title' => (isset($settings['company_title'])) ? $settings['company_title'] : null,
+            'company_sub_title' => (isset($settings['company_sub_title'])) ? $settings['company_sub_title'] : null,
+            'company_description' => (isset($settings['company_description'])) ? $settings['company_description'] : null,
+            'company_button_name' => (isset($settings['company_button_name'])) ? $settings['company_button_name'] : null,
+            'company_button_url' => (isset($settings['company_button_url'])) ? $settings['company_button_url'] : null,
+        ];
+
+//        $earnMoneySection = [
+//            'earning_title' => (isset($settings['earning_title'])) ? $settings['earning_title'] : null,
+//            'earning_sub_title' => (isset($settings['earning_sub_title'])) ? $settings['earning_sub_title'] : null,
+//            'earning_seller_title' => (isset($settings['earning_seller_title'])) ? $settings['earning_seller_title'] : null,
+//            'earning_seller_sub_title' => (isset($settings['earning_seller_sub_title'])) ? $settings['earning_seller_sub_title'] : null,
+//            'earning_seller_button_name' => (isset($settings['earning_seller_button_name'])) ? $settings['earning_seller_button_name'] : null,
+//            'earning_seller_status' => (int)((isset($settings['join_seller_react_status'])) ? $settings['join_seller_react_status'] : 0),
+//            'earning_dm_title' => (isset($settings['earning_dm_title'])) ? $settings['earning_dm_title'] : null,
+//            'earning_dm_sub_title' => (isset($settings['earning_dm_sub_title'])) ? $settings['earning_dm_sub_title'] : null,
+//            'earning_dm_button_name' => (isset($settings['earning_dm_button_name'])) ? $settings['earning_dm_button_name'] : null,
+//            'earning_dm_status' => (int)((isset($settings['join_DM_react_status'])) ? $settings['join_DM_react_status'] : 0),
+//        ];
+//
+//        $businessSection = [
+//            'business_title' => (isset($settings['business_title'])) ? $settings['business_title'] : null,
+//            'business_sub_title' => (isset($settings['business_sub_title'])) ? $settings['business_sub_title'] : null,
+//            'business_image_full_url' => Helpers::get_full_url('business_image', isset($settings['business_image']) ? $settings['business_image'] : null, isset($settings['business_image_storage']) ? $settings['business_image_storage'] : 'public'),
+//        ];
+//
+//        $metaDataSection = [
+//            'meta_title' => (isset($settings['meta_title'])) ? $settings['meta_title'] : null,
+//            'meta_description' => (isset($settings['meta_description'])) ? $settings['meta_description'] : null,
+//            'meta_image_full_url' => Helpers::get_full_url('landing/meta_image', (isset($settings['meta_image'])) ? $settings['meta_image'] : null, (isset($settings['meta_image_storage'])) ? $settings['meta_image_storage'] : 'public'),
+//        ];
+
         return response()->json(
             [
-                'base_urls' => [
-                    'header_icon_url' => asset('storage/app/public/header_icon'),
-                    'header_banner_url' => asset('storage/app/public/header_banner'),
-                    'testimonial_image_url' => asset('storage/app/public/reviewer_image'),
-                    'promotional_banner_url' => asset('storage/app/public/promotional_banner'),
-                    'business_image_url' => asset('storage/app/public/business_image'),
-                ],
-                's3_base_urls' => [
-                    'header_icon_url' => $awsBaseURL . 'header_icon',
-                    'header_banner_url' => $awsBaseURL . 'header_banner',
-                    'testimonial_image_url' => $awsBaseURL . 'reviewer_image',
-                    'promotional_banner_url' => $awsBaseURL . 'promotional_banner',
-                    'business_image_url' => $awsBaseURL . 'business_image',
-                ],
-
-                'header_title' => (isset($settings['header_title'])) ? $settings['header_title'] : null,
-                'header_sub_title' => (isset($settings['header_sub_title'])) ? $settings['header_sub_title'] : null,
-                'header_tag_line' => (isset($settings['header_tag_line'])) ? $settings['header_tag_line'] : null,
-                'header_icon' => (isset($settings['header_icon'])) ? $settings['header_icon'] : null,
-                'header_icon_full_url' => Helpers::get_full_url('header_icon', (isset($settings['header_icon'])) ? $settings['header_icon'] : null, isset($settings['header_icon_storage']) ? $settings['header_icon_storage'] : 'public'),
-                'header_banner' => (isset($settings['header_banner'])) ? $settings['header_banner'] : null,
-                'header_banner_full_url' => Helpers::get_full_url('header_banner', (isset($settings['header_banner'])) ? $settings['header_banner'] : null, isset($settings['header_banner_storage']) ? $settings['header_banner_storage'] : 'public'),
-                'company_title' => (isset($settings['company_title'])) ? $settings['company_title'] : null,
-                'company_sub_title' => (isset($settings['company_sub_title'])) ? $settings['company_sub_title'] : null,
-                'company_description' => (isset($settings['company_description'])) ? $settings['company_description'] : null,
-                'company_button_name' => (isset($settings['company_button_name'])) ? $settings['company_button_name'] : null,
-                'company_button_url' => (isset($settings['company_button_url'])) ? $settings['company_button_url'] : null,
-                'download_user_app_title' => (isset($settings['download_user_app_title'])) ? $settings['download_user_app_title'] : null,
-                'download_user_app_sub_title' => (isset($settings['download_user_app_sub_title'])) ? $settings['download_user_app_sub_title'] : null,
-                'earning_title' => (isset($settings['earning_title'])) ? $settings['earning_title'] : null,
-                'earning_sub_title' => (isset($settings['earning_sub_title'])) ? $settings['earning_sub_title'] : null,
-                'earning_seller_title' => (isset($settings['earning_seller_title'])) ? $settings['earning_seller_title'] : null,
-                'earning_seller_sub_title' => (isset($settings['earning_seller_sub_title'])) ? $settings['earning_seller_sub_title'] : null,
-                'earning_seller_button_name' => (isset($settings['earning_seller_button_name'])) ? $settings['earning_seller_button_name'] : null,
-                'earning_seller_status' => (int)((isset($settings['join_seller_react_status'])) ? $settings['join_seller_react_status'] : 0),
-                'earning_dm_title' => (isset($settings['earning_dm_title'])) ? $settings['earning_dm_title'] : null,
-                'earning_dm_sub_title' => (isset($settings['earning_dm_sub_title'])) ? $settings['earning_dm_sub_title'] : null,
-                'earning_dm_button_name' => (isset($settings['earning_dm_button_name'])) ? $settings['earning_dm_button_name'] : null,
-                'earning_dm_status' => (int)((isset($settings['join_DM_react_status'])) ? $settings['join_DM_react_status'] : 0),
-
-                'business_title' => (isset($settings['business_title'])) ? $settings['business_title'] : null,
-                'business_sub_title' => (isset($settings['business_sub_title'])) ? $settings['business_sub_title'] : null,
-                'business_image' => (isset($settings['business_image'])) ? $settings['business_image'] : null,
-                'business_image_full_url' => Helpers::get_full_url('business_image', isset($settings['business_image']) ? $settings['business_image'] : null, isset($settings['business_image_storage']) ? $settings['business_image_storage'] : 'public'),
-                'testimonial_title' => (isset($settings['testimonial_title'])) ? $settings['testimonial_title'] : null,
-                'testimonial_list' => (isset($reviews)) ? $reviews : null,
-                'fixed_newsletter_title' => (isset($settings['fixed_newsletter_title'])) ? $settings['fixed_newsletter_title'] : null,
-                'fixed_newsletter_sub_title' => (isset($settings['fixed_newsletter_sub_title'])) ? $settings['fixed_newsletter_sub_title'] : null,
-                'fixed_footer_description' => (isset($settings['fixed_footer_description'])) ? $settings['fixed_footer_description'] : null,
-                'fixed_promotional_banner' => (isset($settings['fixed_promotional_banner'])) ? $settings['fixed_promotional_banner'] : null,
-                'fixed_promotional_banner_full_url' => Helpers::get_full_url('promotional_banner', (isset($settings['fixed_promotional_banner'])) ? $settings['fixed_promotional_banner'] : null, (isset($settings['fixed_promotional_banner_storage'])) ? $settings['fixed_promotional_banner_storage'] : 'public'),
-
-                'promotion_banners' => (isset($settings['promotion_banner'])) ? json_decode($settings['promotion_banner'], true) : null,
-                'promotion_banners_full_url' => $promotional_banners,
-                'download_user_app_links' => (isset($settings['download_user_app_links'])) ? json_decode($settings['download_user_app_links'], true) : null,
-                'download_business_app_links' => (isset($settings['download_business_app_links'])) ? json_decode($settings['download_business_app_links'], true) : null,
-
-                'available_zone_status' => (int)((isset($settings['available_zone_status'])) ? $settings['available_zone_status'] : 0),
-                'available_zone_title' => (isset($settings['available_zone_title'])) ? $settings['available_zone_title'] : null,
-                'available_zone_short_description' => (isset($settings['available_zone_short_description'])) ? $settings['available_zone_short_description'] : null,
-                'available_zone_image' => (isset($settings['available_zone_image'])) ? $settings['available_zone_image'] : null,
-                'available_zone_image_full_url' => Helpers::get_full_url('available_zone_image', (isset($settings['available_zone_image'])) ? $settings['available_zone_image'] : null, (isset($settings['available_zone_image_storage'])) ? $settings['available_zone_image_storage'] : 'public'),
-                'available_zone_list' => $zones,
+//                'base_urls' => [
+//                    'header_icon_url' => asset('storage/app/public/header_icon'),
+//                    'header_banner_url' => asset('storage/app/public/header_banner'),
+//                    'testimonial_image_url' => asset('storage/app/public/reviewer_image'),
+//                    'promotional_banner_url' => asset('storage/app/public/promotional_banner'),
+//                    'business_image_url' => asset('storage/app/public/business_image'),
+//                ],
+//                's3_base_urls' => [
+//                    'header_icon_url' => $awsBaseURL.'header_icon',
+//                    'header_banner_url' => $awsBaseURL.'header_banner',
+//                    'testimonial_image_url' => $awsBaseURL.'reviewer_image',
+//                    'promotional_banner_url' => $awsBaseURL.'promotional_banner',
+//                    'business_image_url' => $awsBaseURL.'business_image',
+//                ],
+                'hero_section' => $heroSection,
+                'trust_section' => $trustSection,
+                'available_zone_section' => $availableZoneSection,
+                'promotional_banner_section' => $promotionalBannerSection,
+                'user_app_download_section' => $userAppDownloadSection,
+                'popular_client_section' => $popularClientSection,
+                'seller_app_download_section' => $sellerAppDownloadSection,
+                'deliveryman_app_download_section' => $deliverymanAppDownloadSection,
+                'banner_section' => $bannerSection,
+                'testimonial_section' => $testimonialSection,
+                'gallery_section' => $gallerySection,
+                'highlight_section' => $highlightSection,
+                'faq_section' => $faqSection,
+                'footer_section' => $footerSection,
+                'company_intro_section' => $companyIntroSection,
+//                'earn_money_section' => $earnMoneySection,
+//                'business_section' => $businessSection,
+//                'meta_data_section' => $metaDataSection,
 
                 'module_home_page_data_title' => (isset($settings['module_home_page_data_title'])) ? $settings['module_home_page_data_title'] : null,
                 'module_home_page_data_sub_title' => (isset($settings['module_home_page_data_sub_title'])) ? $settings['module_home_page_data_sub_title'] : null,
@@ -778,14 +923,8 @@ class ConfigController extends Controller
                 'module_vendor_registration_data_title' => (isset($settings['module_vendor_registration_data_title'])) ? $settings['module_vendor_registration_data_title'] : null,
                 'module_vendor_registration_data_sub_title' => (isset($settings['module_vendor_registration_data_sub_title'])) ? $settings['module_vendor_registration_data_sub_title'] : null,
                 'module_vendor_registration_data_button_title' => (isset($settings['module_vendor_registration_data_button_title'])) ? $settings['module_vendor_registration_data_button_title'] : null,
-                'module_vendor_registration_data_image' =>
-                isset($settings['module_vendor_registration_data_image']) ?
+                'module_vendor_registration_data_image' => isset($settings['module_vendor_registration_data_image']) ?
                     Helpers::get_full_url('react_landing', $settings['module_vendor_registration_data_image'] ?? '', $settings['module_vendor_registration_data_image_storage'] ?? 'public', 'upload_image_1') : '',
-
-                'meta_title' => (isset($settings['meta_title'])) ? $settings['meta_title'] : null,
-                'meta_description' => (isset($settings['meta_description'])) ? $settings['meta_description'] : null,
-                'meta_image' =>Helpers::get_full_url('landing/meta_image', (isset($settings['meta_image'])) ? $settings['meta_image'] : null, (isset($settings['meta_image_storage'])) ? $settings['meta_image_storage'] : 'public'),
-
             ]
         );
     }
@@ -897,10 +1036,11 @@ class ConfigController extends Controller
                     'gateway' => $method->key_name,
                     'gateway_title' => $additional_data?->gateway_title,
                     'gateway_image' => $additional_data?->gateway_image,
-                    'gateway_image_full_url' => Helpers::get_full_url('payment_modules/gateway_image', $additional_data?->gateway_image, $additional_data?->storage ?? 'public')
+                    'gateway_image_full_url' => Helpers::get_full_url('payment_modules/gateway_image', $additional_data?->gateway_image, $additional_data?->storage ?? 'public'),
                 ];
             }
         }
+
         return $data;
     }
 
@@ -924,10 +1064,11 @@ class ConfigController extends Controller
                     'gateway' => $method->key_name,
                     'gateway_title' => $additional_data?->gateway_title,
                     'gateway_image' => $additional_data?->gateway_image,
-                    'gateway_image_full_url' => Helpers::get_full_url('payment_modules/gateway_image', $additional_data?->gateway_image, $additional_data?->storage ?? 'public')
+                    'gateway_image_full_url' => Helpers::get_full_url('payment_modules/gateway_image', $additional_data?->gateway_image, $additional_data?->storage ?? 'public'),
                 ];
             }
         }
+
         return $data;
     }
 
@@ -935,6 +1076,7 @@ class ConfigController extends Controller
     {
         $data = OfflinePaymentMethod::where('status', 1)->get();
         $data = $data->count() > 0 ? $data : null;
+
         return response()->json($data, 200);
     }
 
@@ -946,7 +1088,7 @@ class ConfigController extends Controller
                 'id' => $item['id'],
                 'name' => $item['name'],
                 'display_name' => $item['display_name'] ? $item['display_name'] : $item['name'],
-                'modules' => $item->modules->pluck('module_name')
+                'modules' => $item->modules->pluck('module_name'),
             ];
         }
         $data = $storage;
@@ -968,33 +1110,33 @@ class ConfigController extends Controller
         }
 
         $apiKey = $this->map_api_key;
-        $url = "https://routes.googleapis.com/directions/v2:computeRoutes";
+        $url = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 
         $data = [
-            "origin" => [
-                "location" => [
-                    "latLng" => [
-                        "latitude" => $request['origin_lat'],
-                        "longitude" => $request['origin_lng']
-                    ]
-                ]
+            'origin' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => $request['origin_lat'],
+                        'longitude' => $request['origin_lng'],
+                    ],
+                ],
             ],
-            "destination" => [
-                "location" => [
-                    "latLng" => [
-                        "latitude" => $request['destination_lat'],
-                        "longitude" => $request['destination_lng']
-                    ]
-                ]
+            'destination' => [
+                'location' => [
+                    'latLng' => [
+                        'latitude' => $request['destination_lat'],
+                        'longitude' => $request['destination_lng'],
+                    ],
+                ],
             ],
-            "travelMode" => strtoupper($request['mode'] ?? 'DRIVE'),
-            "routingPreference" => "TRAFFIC_AWARE",
+            'travelMode' => strtoupper($request['mode'] ?? 'DRIVE'),
+            'routingPreference' => 'TRAFFIC_AWARE',
         ];
 
         $headers = [
-            "Content-Type: application/json",
+            'Content-Type: application/json',
             "X-Goog-Api-Key: $apiKey",
-            "X-Goog-FieldMask: routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
+            'X-Goog-FieldMask: routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
         ];
 
         $ch = curl_init();
@@ -1010,12 +1152,11 @@ class ConfigController extends Controller
         curl_close($ch);
 
         if ($error) {
-            return ["error" => $error];
+            return ['error' => $error];
         }
+
         return json_decode($response, true);
     }
-
-
 
     public function parcel_cancellation_reason(Request $request)
     {
@@ -1030,28 +1171,29 @@ class ConfigController extends Controller
             ->when($request->cancellation_type, function ($query) use ($request) {
                 $query->where('cancellation_type', $request->cancellation_type);
             })
-
             ->paginate($limit, ['*'], 'page', $offset);
 
         $data = [
             'total_size' => $reasons->total(),
             'limit' => $limit,
             'offset' => $offset,
-            'data'       => $reasons->getCollection()->map(function ($item) {
+            'data' => $reasons->getCollection()->map(function ($item) {
                 return [
-                    'id'                => $item->id,
-                    'reason'            => $item->reason,
-                    'user_type'         => $item->user_type,
+                    'id' => $item->id,
+                    'reason' => $item->reason,
+                    'user_type' => $item->user_type,
                     'cancellation_type' => $item->cancellation_type,
                 ];
             }),
         ];
+
         return response()->json($data, 200);
     }
+
     public function analyticScripts()
     {
-        $analytics=Cache::rememberForever("analytic_script", function () {
-            return AnalyticScript::where('is_active',1)->select(['type', 'script_id',])->get()->toArray();
+        $analytics = Cache::rememberForever('analytic_script', function () {
+            return AnalyticScript::where('is_active', 1)->select(['type', 'script_id'])->get()->toArray();
         });
 
         return response()->json($analytics ?? [], 200);

@@ -2,10 +2,10 @@
   'admin_panel' => 
   array (
     'active' => '1',
-    'username' => 'siptsgcr',
-    'purchase_key' => '7a7b2216-4acb-4dc6-b243-99edabf3ba66',
+    'username' => 'skyagarwal',
+    'purchase_key' => '6a0fc663-1fd6-41fa-94a3-762d88c0f613',
     'software_id' => 'MzY3NzIxMTI=',
-    'domain' => 'localhost/Backend-6amMart/public',
+    'domain' => 'testing.mangwale.com',
     'software_type' => 'product',
   ),
   'vendor_panel' => 
@@ -29,28 +29,28 @@
   'vendor_app' => 
   array (
     'active' => '1',
-    'username' => 'siptsgcr',
-    'purchase_key' => '7a7b2216-4acb-4dc6-b243-99edabf3ba66',
+    'username' => '',
+    'purchase_key' => '',
     'software_id' => 'MzY3NzIxNzM=',
-    'domain' => 'localhost/Backend-6amMart/public',
+    'domain' => '',
     'software_type' => 'addon',
   ),
   'deliveryman_app' => 
   array (
     'active' => '1',
-    'username' => 'siptsgcr',
-    'purchase_key' => '7a7b2216-4acb-4dc6-b243-99edabf3ba66',
+    'username' => '',
+    'purchase_key' => '',
     'software_id' => 'MzY3NzIxNDg=',
-    'domain' => 'localhost/Backend-6amMart/public',
+    'domain' => '',
     'software_type' => 'addon',
   ),
   'react_web' => 
   array (
     'active' => '1',
-    'username' => 'siptsgcr',
-    'purchase_key' => '7a7b2216-4acb-4dc6-b243-99edabf3ba66',
+    'username' => '',
+    'purchase_key' => '',
     'software_id' => 'NDUzNzAzNTE=',
-    'domain' => 'localhost/Backend-6amMart/public',
+    'domain' => '',
     'software_type' => 'addon',
   ),
 );

@@ -14,7 +14,6 @@ use App\Models\Store;
 use App\Models\Banner;
 use App\Models\Coupon;
 use App\Models\Module;
-use App\Models\Review;
 use App\Models\Contact;
 use App\Models\Campaign;
 use App\Models\CashBack;
@@ -34,12 +33,9 @@ use App\Models\Notification;
 use App\Models\RecentSearch;
 use Illuminate\Http\Request;
 use App\Models\Advertisement;
-use App\Models\WalletPayment;
 use App\Models\ParcelCategory;
 use App\Models\CommonCondition;
-use App\Models\WithdrawRequest;
 use App\Models\WithdrawalMethod;
-use App\Models\StoreSubscription;
 use App\Models\WalletTransaction;
 use Illuminate\Http\JsonResponse;
 use Modules\Rental\Entities\Trips;
@@ -49,7 +45,6 @@ use Modules\Rental\Entities\Vehicle;
 use Illuminate\Support\Facades\Route;
 use App\Models\LoyaltyPointTransaction;
 use Modules\Rental\Entities\VehicleBrand;
-use Modules\Rental\Entities\VehicleDriver;
 use Modules\Rental\Entities\VehicleReview;
 use Modules\Rental\Entities\VehicleCategory;
 
@@ -109,7 +104,7 @@ class SearchRoutingController extends Controller
         });
 
 
-        $excludeTermsRoute = ['{status}', 'review-status', 'review-export', 'export-review'];
+        $excludeTermsRoute = ['{status}', 'review-status', 'review-export','{locale}','export-review','admin/transactions/report/vendor-tax-report','-auto-fill'];
         if (!addon_published_status('Rental') || $currentModuleType !== 'rental') {
             $excludeTermsRoute[] = 'rental';
         }
@@ -123,6 +118,8 @@ class SearchRoutingController extends Controller
         $excludeTermsAjax = array_values(array_diff($excludeTermsAjax, $addUrl));
 
         $excludeTerms = array_merge($excludeTermsAjax, $excludeTermsRoute);
+
+
         $adminRoutes = $adminRoutes->filter(function ($route) use ($excludeTerms) {
             foreach ($excludeTerms as $term) {
                 if (str_contains($route->uri(), $term)) {
@@ -131,7 +128,8 @@ class SearchRoutingController extends Controller
             }
             return true;
         });
-
+//         // print_r($adminRoutes->toArray());
+// dd($adminRoutes->toArray());
         $validRoutes = [];
         if (is_numeric($searchKeyword) && $searchKeyword > 0) {
             //store

@@ -22,20 +22,32 @@ $(document).ready(function() {
 });
 
 function highlightKeyword(keyword) {
+    if (!keyword) return;
+
     var regex = new RegExp(keyword, 'gi');
     var textNodes = getTextNodes(document.body);
 
     textNodes.forEach(function(node, index) {
-        if (regex.test(node.nodeValue)) {
-            var newHtml = node.nodeValue.replace(regex, '<span id="highlighted-' + index + '" class="highlighted-keyword">$&</span>');
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = newHtml;
-
-            while (tempDiv.firstChild) {
-                node.parentNode.insertBefore(tempDiv.firstChild, node);
+        var text = node.nodeValue;
+        if (!regex.test(text)) return;
+        var parts = text.split(/(\w+)/);
+        var html = parts.map(function(part) {
+            if (regex.test(part)) {
+                var inner = part.replace(regex, function(match) {
+                    return '<span class="highlighted-keyword">' + match + '</span>';
+                });
+                return '<span class="highlighted-word">' + inner + '</span>';
             }
-            node.parentNode.removeChild(node);
+            return part;
+        }).join('');
+
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        while (tempDiv.firstChild) {
+            node.parentNode.insertBefore(tempDiv.firstChild, node);
         }
+        node.parentNode.removeChild(node);
     });
 }
 

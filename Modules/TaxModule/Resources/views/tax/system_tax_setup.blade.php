@@ -450,6 +450,241 @@
             </div>
         </div>
     </div>
+
+    <!-- global guideline view Offcanvas here -->
+    <div id="global_guideline_offcanvas" class="custom-offcanvas d-flex flex-column justify-content-between">
+        <form action="{{ route('taxvat.store') }}" method="post">
+            <div>
+                <div class="custom-offcanvas-header bg--secondary d-flex justify-content-between align-items-center px-3 py-3">
+                    <div class="py-1">
+                        <h3 class="mb-0 line--limit-1">{{ translate('messages.Create Tax Guideline') }}</h3>
+                    </div>
+                    <button type="button" class="btn-close w-25px h-25px border rounded-circle d-center bg--secondary text-dark offcanvas-close fz-15px p-0"aria-label="Close">
+                        &times;
+                    </button>
+                </div>
+                <div class="custom-offcanvas-body custom-offcanvas-body-100  p-20">
+                    <div class="">
+                        <div class="py-3 px-3 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapse show" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_01" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Setup Tax Calculation') }}</span>
+                                </button>
+                                <!-- <a href="javascript:void(0)" class="fs-12 text-nowrap theme-clr text-underline">
+                                    {{translate('Let’s Setup')}}
+                                </a> -->
+                            </div>
+                            <div class="collapse mt-3 show" id="collapseGeneralSetup_01">
+                                <div class="card rounded border p-3 card-body">
+                                    <div class="mb-3">
+                                        <p class="m-0 fs-12 color-656566">
+                                            This page allows you to configure how and where taxes are calculated for your vendors.
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('You can decide:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('Whether tax should be included in the product price or added separately')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('Which parts of the order should have taxes applied — items, delivery fees, or packaging')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('This gives you full control over how your business handles tax visibility and accuracy.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_032" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Tax Calculation Method') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_032">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <div class="mb-3">
+                                        <p class="m-0 color-656566 fs-12">{{translate('You can choose one of two ways to calculate tax:')}}</p>
+                                    </div>                               
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Calculate Tax Included in Product Price')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('The tax is already included in the listed item price.')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('The customer sees a single total price (no separate tax line).')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('Invoices and reports won’t show separate VAT amounts.')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('Use this method if your displayed prices are “tax-included.')}}</li>
+                                        </ul>
+                                    </div>
+                                     <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Calculate Tax Excluded from Product Price')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('The tax is added on top of the item price.')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('Customers will see a separate tax line during checkout and in their invoice.')}}</li>
+                                            <li class="fs-12 color-656566">{{translate('This method gives you clear, transparent VAT reporting.')}}</li>
+                                        </ul>
+                                    </div>
+                                    <p class="m-0 fs-12 color-656566">
+                                        {{ translate('Recommendation: Use “Tax Excluded from Product Price” if you want to show taxes separately for better reporting.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_033" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Tax Effect on Orders') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_033">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <p class="fs-12 mb-3 color-656566">The system applies tax only to orders placed after you enable it.</p>  
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Before activation:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('Orders placed earlier will not have any tax added.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('After activation:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('All new orders will automatically calculate and apply the correct tax.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('After deactivation:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('If you turn off tax again, future orders will not include tax until reactivated.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <p class="m-0 fs-12 color-656566">
+                                        {{ translate('This ensures older orders stay accurate while new ones follow updated rules.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_044" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Flexible Tax Application Options') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_044">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <p class="fs-12 mb-3 color-656566">You can choose how the tax applies depending on your business model:</p>  
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Order-wise Tax:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('One flat tax rate applies to the total order.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Product-wise Tax: ')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('Each product or food item can have its own tax rate.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('Category-wise Tax: ')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('Different product categories can carry different tax rates.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <p class="m-0 fs-12 color-656566">
+                                        {{ translate('This flexibility lets you match complex tax rules for restaurants, grocery stores, or other service types.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_055" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Uploaded Prescription Orders (Pharmacy Module Only)') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_055">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <div class="mb-3">
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('For pharmacy modules, tax applies order-wise on uploaded prescription orders.')}}</li>                                            
+                                            <li class="fs-12 color-656566">{{translate('You can set the tax type and rate specifically for these orders.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_066" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Additional Setup') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_066">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('You can also configure tax for packaging charges.')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('If enabled, packaging costs will include tax as per your setup — ensuring your total billing remains compliant.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <p class="m-0 fs-12 color-656566">
+                                        {{ translate('Example: If packaging costs $2 and tax is 10%, the total will show as $2.20.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-12 p-sm-20 bg-light rounded mb-3">
+                            <div class="d-flex gap-3 align-items-center justify-content-between overflow-hidden">
+                                <button class="btn-collapse line--limit-1 d-flex gap-3 align-items-center bg-transparent border-0 p-0 collapsed" type="button"
+                                        data-toggle="collapse" data-target="#collapseGeneralSetup_077" aria-expanded="true">
+                                    <div class="btn-collapse-icon w-35px h-35px bg-white d-flex align-items-center justify-content-center border icon-btn rounded-circle fs-12 lh-1 collapsed">
+                                        <i class="tio-down-ui top-01 color-656566"></i>
+                                    </div>
+                                    <span class="font-semibold text-left fs-14 text-title line--limit-1">{{ translate('Final Step – Save Your Setup') }}</span>
+                                </button>
+                            </div>
+                            <div class="collapse mt-3" id="collapseGeneralSetup_077">
+                                <div class="card rounded border p-3 card-body"> 
+                                    <div class="mb-3">
+                                        <h6 class="mb-2 fs-12 color-656566">{{translate('After completing all configurations:')}}</h6>
+                                        <ul class="mb-0 list-group pl-3 d-flex flex-column gap-1px">
+                                            <li class="fs-12 color-656566">{{translate('Click Save Information to apply changes.')}}</li>                                            
+                                            <li class="fs-12 color-656566">{{translate('Click Reset if you want to start over or discard unsaved edits.')}}</li>                                            
+                                        </ul>
+                                    </div>
+                                    <p class="m-0 fs-12 color-656566">
+                                        {{ translate('Once saved, your tax setup will instantly affect all applicable orders moving forward.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="offcanvasOverlay" class="offcanvas-overlay"></div>
+    <!-- global guideline view Offcanvas end -->
 @endsection
 
 

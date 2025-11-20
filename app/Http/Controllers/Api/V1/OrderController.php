@@ -504,7 +504,7 @@ class OrderController extends Controller
 
             $data = [
                 'title' => translate('Order_Notification'),
-                'description' => translate('messages.new_order_push_description'),
+                'description' => translate('New order alert, confirm to proceed'),
                 'order_id' => $order->id,
                 'image' => '',
                 'module_id' => $order->module_id,

@@ -11,6 +11,7 @@ trait FileManagerTrait
     {
         try {
             if ($image != null) {
+                $format = $image->getClientOriginalExtension();
                 $imageName = Carbon::now()->toDateString() . "-" . uniqid() . "." . $format;
                 if (!Storage::disk(self::getDisk())->exists($dir)) {
                     Storage::disk(self::getDisk())->makeDirectory($dir);
@@ -27,7 +28,6 @@ trait FileManagerTrait
 
     public static function updateAndUpload(string $dir, $old_image, string $format, $image = null): mixed
     {
-//        dd(self::getDisk());
         if ($image == null) {
             return $old_image;
         }

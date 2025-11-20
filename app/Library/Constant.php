@@ -844,3 +844,8 @@ const TELEPHONE_CODES = [
     ["name" => 'Zambia (+260)', "code" => '+260'],
     ["name" => 'Zimbabwe (+263)', "code" => '+263'],
 ];
+
+
+const IMAGE_FORMAT_FOR_VALIDATION = 'jpeg,jpg,png,gif,webp';
+const IMAGE_FORMAT = "jpg, jpeg, png, gif, webp";
+const IMAGE_EXTENSION = ".jpg, .jpeg, .png, .gif, .webp";

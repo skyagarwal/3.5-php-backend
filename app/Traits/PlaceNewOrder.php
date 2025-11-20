@@ -1066,7 +1066,7 @@ trait PlaceNewOrder
                             return [
                                 'status_code' => 403,
                                 'code' => 'stock',
-                                'message' => $product->title . ' ' . translate('messages.is_out_of_stock')
+                                'message' => $isCampaign ? $product?->title : $product?->name . ' ' . translate('messages.is_out_of_stock')
                             ];
                         }
                         $product_data[] = [
@@ -1242,7 +1242,7 @@ trait PlaceNewOrder
                                 return [
                                     'status_code' => 403,
                                     'code' => 'stock',
-                                    'message' => $product->title . ' ' . translate('messages.is_out_of_stock')
+                                    'message' => $isCampaign ? $product?->title : $product?->name . ' ' . translate('messages.is_out_of_stock')
                                 ];
                             }
 
@@ -1402,7 +1402,6 @@ trait PlaceNewOrder
                             $price = $product['price'];
                         }
                     } else {
-                        //                        if (count(json_decode($product['variations'], true)) > 0 && count($c['variation']) > 0) {
                         if (
                             is_array(json_decode($product['variations'], true)) && count(json_decode($product['variations'], true)) > 0 &&
                             is_array($c['variation']) && count($c['variation']) > 0
@@ -1421,7 +1420,7 @@ trait PlaceNewOrder
                                 return [
                                     'status_code' => 403,
                                     'code' => 'stock',
-                                    'message' => $product->title . ' ' . translate('messages.is_out_of_stock')
+                                    'message' => $isCampaign ? $product?->title : $product?->name . ' ' . translate('messages.is_out_of_stock')
                                 ];
                             }
                             $product_data[] = [

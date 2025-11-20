@@ -84,7 +84,7 @@ class ItemController extends Controller
         }
 
         if ($request['price'] <= $dis) {
-            $validator->getMessageBag()->add('unit_price', translate("Discount amount can't be greater than 100%"));
+            $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
         }
 
         if ($request['price'] <= $dis || $validator->fails()) {
@@ -467,7 +467,7 @@ class ItemController extends Controller
         }
 
         if ($request['price'] <= $dis) {
-            $validator->getMessageBag()->add('unit_price', translate("Discount amount can't be greater than 100%"));
+            $validator->getMessageBag()->add('unit_price', translate("Discount amount must be less than 100% or unit price"));
         }
 
         if ($request['price'] <= $dis || $validator->fails()) {
@@ -1659,11 +1659,6 @@ class ItemController extends Controller
         }
         return Excel::download(new StoreItemExport($data), $typ . 'List.xlsx');
 
-        // if ($request->type == 'excel') {
-        //     return (new FastExcel(Helpers::export_store_item($item)))->download('Items.xlsx');
-        // } elseif ($request->type == 'csv') {
-        //     return (new FastExcel(Helpers::export_store_item($item)))->download('Items.csv');
-        // }
     }
 
     public function export(Request $request)
@@ -1736,15 +1731,6 @@ class ItemController extends Controller
             return Excel::download(new ItemListExport($data), $format_type . 'List.csv');
         }
         return Excel::download(new ItemListExport($data), $format_type . 'List.xlsx');
-
-
-        // if ($types == 'excel') {
-        //     return (new FastExcel(Helpers::export_items(Helpers::Export_generator($item),$module_type)))->download('Items.xlsx');
-        // } elseif ($types == 'csv') {
-        //     return (new FastExcel(Helpers::export_items(Helpers::Export_generator($item),$module_type)))->download('Items.csv');
-        // }
-
-
 
     }
 

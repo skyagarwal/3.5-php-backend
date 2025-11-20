@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const titleOff = checkbox.getAttribute("data-title-off");
             const textOn = checkbox.getAttribute("data-text-on");
             const textOff = checkbox.getAttribute("data-text-off");
-
             const isChecked = checkbox.checked;
 
             if (isChecked) {
@@ -101,23 +100,37 @@ document.addEventListener("DOMContentLoaded", function () {
     langLinks.forEach(function (langLink) {
         langLink.addEventListener("click", function (e) {
             e.preventDefault();
-            langLinks.forEach(function (link) {
+
+            let section = this.parentElement;
+            while (section && section !== document.body) {
+                if (section.querySelector('.nav-tabs') && section.querySelector('.lang_form')) {
+                    break;
+                }
+                section = section.parentElement;
+            }
+            section = section || document;
+
+            section.querySelectorAll(".lang_link").forEach(function (link) {
                 link.classList.remove("active");
             });
             this.classList.add("active");
-            document.querySelectorAll(".lang_form").forEach(function (form) {
+
+            section.querySelectorAll(".lang_form").forEach(function (form) {
                 form.classList.add("d-none");
             });
-            let form_id = this.id;
-            let lang = form_id.substring(0, form_id.length - 5);
 
-            $("#" + lang + "-form").removeClass("d-none");
-            $("#" + lang + "-form1").removeClass("d-none");
-            $("#" + lang + "-form2").removeClass("d-none");
-            $("#" + lang + "-form3").removeClass("d-none");
-            $("#" + lang + "-form4").removeClass("d-none");
+            let form_id = this.id;
+            let lang = form_id.split('-link')[0];
+            let suffix = form_id.substring(form_id.indexOf('-link') + 5);
+
+            $(section).find("#" + lang + "-form" + suffix).removeClass("d-none");
+            $(section).find("#" + lang + "-form1" + suffix).removeClass("d-none");
+            $(section).find("#" + lang + "-form2" + suffix).removeClass("d-none");
+            $(section).find("#" + lang + "-form3" + suffix).removeClass("d-none");
+            $(section).find("#" + lang + "-form4" + suffix).removeClass("d-none");
+
             if (lang === "default") {
-                $(".default-form").removeClass("d-none");
+                $(section).find(".default-form").removeClass("d-none");
             }
         });
     });
@@ -167,6 +180,7 @@ $(document).ready(function () {
     ).each(function () {
         let targetedImage = $(this).find(".img");
         let targetedImageSrc = $(this).find(".img img");
+
         function proPicURL(input) {
             if (input.files && input.files[0]) {
                 let uploadedFile = new FileReader();
@@ -179,6 +193,7 @@ $(document).ready(function () {
                 uploadedFile.readAsDataURL(input.files[0]);
             }
         }
+
         $(this)
             .find("input")
             .on("change", function () {
@@ -187,7 +202,7 @@ $(document).ready(function () {
     });
 
     $(".read-url").on("change", function () {
-        readUrl(this);
+        readURL(this);
     });
 });
 $(document).on("ready", function () {
@@ -498,9 +513,9 @@ $(document).on("click", ".confirm-Toggle", function () {
                 }
                 input.setAttribute('disabled', true);
             });
-                $('.add_text_mute').addClass('text-muted').removeClass('text-dark');
+            $('.add_text_mute').addClass('text-muted').removeClass('text-dark');
 
-                $("#free_delivery_over").attr("readonly" , true).removeAttr("required");
+            $("#free_delivery_over").attr("readonly", true).removeAttr("required");
         }
     }
 
@@ -517,11 +532,11 @@ document.querySelectorAll('[name="search"]').forEach(function (element) {
     element.addEventListener("input", function (event) {
         if (this.value === "" && window.location.search !== "") {
             let baseUrl = window.location.origin + window.location.pathname;
-            if($(this).data("reload_url")){
+            if ($(this).data("reload_url")) {
                 let reload_url = new URL($(this).data("reload_url"));
-                 reload_url.searchParams.delete("search");
+                reload_url.searchParams.delete("search");
                 window.location.href = reload_url;
-            } else{
+            } else {
                 window.location.href = baseUrl;
             }
 
@@ -557,29 +572,26 @@ document.addEventListener('DOMContentLoaded', function () {
             const success_btn_text = data.getAttribute('data-success_btn_text');
 
 
-
             $('#get-text-note').val('');
             $('#modal-title').empty().append(title);
             $('#modal-text').empty().append(text);
-            $('#image-src').attr('src',image);
+            $('#image-src').attr('src', image);
             $('#new-dynamic-submit-model').modal('show');
             $('#new-dynamic-ok-button').addClass('btn-primary');
             $('#new-dynamic-ok-button-show').addClass('d-none');
             $('#hide-buttons').addClass('d-none');
 
 
-            if(type === 'delete'){
+            if (type === 'delete') {
                 $('#new-dynamic-ok-button').attr('toggle-ok-button', dataId);
                 $('#note-data').addClass('d-none');
                 $('#hide-buttons').removeClass('d-none');
-                }
-            else if(type === 'pause'){
+            } else if (type === 'pause') {
                 $('#new-dynamic-ok-button').attr('toggle-ok-button', dataId);
                 $('#hide-buttons').removeClass('d-none');
                 $('#note-data').removeClass('d-none');
                 $('#get-text-note').attr('get-text-note-id', dataId);
-                }
-            else if(type === 'deny'){
+            } else if (type === 'deny') {
                 $('#new-dynamic-ok-button').attr('toggle-ok-button', dataId);
                 $('#hide-buttons').removeClass('d-none');
                 $('#note-data').removeClass('d-none');
@@ -587,17 +599,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('#new-dynamic-ok-button').removeClass('btn-primary').addClass(btn_class);
                 $('#cancel_btn_text').text(cancel_btn_text);
 
-                }
-            else if(type === 'resume'){
+            } else if (type === 'resume') {
                 $('#new-dynamic-ok-button').attr('toggle-ok-button', dataId);
                 $('#hide-buttons').removeClass('d-none');
                 $('#note-data').addClass('d-none');
                 $('#new-dynamic-ok-button').removeClass('btn-primary').addClass(btn_class);
-                    if(success_btn_text){
-                        $('#new-dynamic-ok-button').text(success_btn_text);
-                    }
+                if (success_btn_text) {
+                    $('#new-dynamic-ok-button').text(success_btn_text);
                 }
-            else{
+            } else {
                 $('#note-data').addClass('d-none');
                 $('#hide-buttons').addClass('d-none');
                 $('#new-dynamic-ok-button-show').removeClass('d-none');
@@ -608,18 +618,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 $(document).on('click', '.confirm-model', function () {
     let Status_toggle = $('#new-dynamic-ok-button').attr('toggle-ok-button');
-    $('#'+Status_toggle+'_form').submit();
+    $('#' + Status_toggle + '_form').submit();
 });
 $(document).on('keyup', '#get-text-note', function () {
     let text_data = $('#get-text-note').attr('get-text-note-id');
-    $('#'+text_data+'_note').val($(this).val());
+    $('#' + text_data + '_note').val($(this).val());
 });
 
-$(document).ready(function(){
+$(document).ready(function () {
     $(function () {
 
-        $('.suggestion_dropdown .dropdown-item').on('click', function(){
-            let input =$(this).closest('.suggestion_dropdown').children('input')
+        $('.suggestion_dropdown .dropdown-item').on('click', function () {
+            let input = $(this).closest('.suggestion_dropdown').children('input')
             input.val($(this).text())
             $(this).closest('.dropdown-menu').removeClass('show')
             input.focus()
@@ -636,7 +646,7 @@ $(document).ready(function(){
                 });
                 dropdown.addClass('show');
 
-                if(!dropdown.find(".dropdown-item:visible").length ){
+                if (!dropdown.find(".dropdown-item:visible").length) {
                     dropdown.removeClass('show')
                 }
             });
@@ -645,7 +655,7 @@ $(document).ready(function(){
             e.preventDefault()
             let dropdown = $(this).closest('.suggestion_dropdown').find(".dropdown-menu");
             dropdown.addClass('show');
-            if(dropdown.find(".dropdown-item:visible").length == 0){
+            if (dropdown.find(".dropdown-item:visible").length == 0) {
                 dropdown.removeClass('show')
             }
         });
@@ -653,7 +663,7 @@ $(document).ready(function(){
         $(".suggestion_dropdown").find(".form-control").on("blur", function (e) {
             const timer = setTimeout(() => {
                 $(this).closest('.suggestion_dropdown').find(".dropdown-menu").removeClass('show')
-            } , 200)
+            }, 200)
             return () => clearTimeout(timer)
         });
 
@@ -664,7 +674,7 @@ $(document).ready(function () {
         const $submitButton = $(this).find('button[type="submit"]');
         $submitButton.prop('disabled', true);
         setTimeout(() => {
-        $submitButton.prop('disabled', false);
+            $submitButton.prop('disabled', false);
         }, 2000);
     });
 });
@@ -674,6 +684,7 @@ $(document).on('mouseenter', '.js-filename-truncate', function () {
     const shortName = truncateImageName(originalText, 15);
     $(this).text(shortName);
 });
+
 function truncateImageName(filename, maxLength = 15) {
     const extensionIndex = filename.lastIndexOf('.');
     const extension = filename.slice(extensionIndex);
@@ -688,8 +699,6 @@ function truncateImageName(filename, maxLength = 15) {
 
     return trimmedName + '...' + extension;
 }
-
-
 
 
 //Product Gallery Text hide showing
@@ -750,8 +759,6 @@ $('.description-area').each(function () {
 });
 
 
-
-
 $(document).ready(function () {
     $(".tags-inner").each(function () {
         let $container = $(this);
@@ -797,15 +804,16 @@ $(".js-select2-counting").select2({
     templateSelection: function (data) {
         return data.text;
     }
-    }).on("select2:open select2:close select2:select select2:unselect", function () {
+}).on("select2:open select2:close select2:select select2:unselect", function () {
     setTimeout(updateCounting, 10);
-    });
-    $(window).on("load resize", updateCounting);
-    function updateCounting() {
+});
+$(window).on("load resize", updateCounting);
+
+function updateCounting() {
     $(".js-select2-counting").each(function () {
-        const $container  = $(this).next(".select2-container");
-        const $rendered   = $container.find(".select2-selection__rendered"); // the <ul>
-        const $choices    = $rendered.children(".select2-selection__choice");
+        const $container = $(this).next(".select2-container");
+        const $rendered = $container.find(".select2-selection__rendered"); // the <ul>
+        const $choices = $rendered.children(".select2-selection__choice");
 
         const availableWidth = $rendered.width();
         let usedWidth = 0;
@@ -816,12 +824,12 @@ $(".js-select2-counting").select2({
 
         // hide overflowed tags
         $choices.each(function () {
-        const $c = $(this);
-        usedWidth += $c.outerWidth(true);
-        if (usedWidth > availableWidth - 30) {
-            $c.hide();
-            hiddenCount++;
-        }
+            const $c = $(this);
+            usedWidth += $c.outerWidth(true);
+            if (usedWidth > availableWidth - 30) {
+                $c.hide();
+                hiddenCount++;
+            }
         });
 
         // remove old counter next to the UL
@@ -829,31 +837,400 @@ $(".js-select2-counting").select2({
 
         // insert the counter **outside** the UL, as a sibling
         if (hiddenCount > 0) {
-        $('<button type="button" class="select2-counting-btn btn btn--primary px-1 py-1">+' + hiddenCount + '</button>')
-            .insertAfter($rendered);
+            $('<button type="button" class="select2-counting-btn btn btn--primary px-1 py-1">+' + hiddenCount + '</button>')
+                .insertAfter($rendered);
         }
     });
 }
 
-        function swalFire(url,title, message, imageUrl,cancelButtonText, confirmButtonText) {
-            Swal.fire({
-                title: title,
-                text: message,
-                imageUrl: imageUrl,
-                imageWidth: 80,
-                imageHeight: 80,
-                imageAlt: 'Custom icon',
-                showCancelButton: true,
-                showCloseButton: true,
-                closeButtonHtml: '×',
-                cancelButtonColor: 'default',
-                confirmButtonColor: 'primary',
-                cancelButtonText:cancelButtonText,
-                confirmButtonText: confirmButtonText,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    location.href = url;
-                }
-            })
+function swalFire(url, title, message, imageUrl, cancelButtonText, confirmButtonText) {
+    Swal.fire({
+        title: title,
+        text: message,
+        imageUrl: imageUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Custom icon',
+        showCancelButton: true,
+        showCloseButton: true,
+        closeButtonHtml: '×',
+        cancelButtonColor: 'default',
+        confirmButtonColor: 'primary',
+        cancelButtonText: cancelButtonText,
+        confirmButtonText: confirmButtonText,
+        reverseButtons: true
+    }).then((result) => {
+        if (result.value) {
+            location.href = url;
         }
+    })
+}
+
+
+$(document).ready(function () {
+    //Trust Preview Slider
+    $('.common-carousel-wrapper').each(function () {
+        const $wrapper = $(this),
+            $next = $wrapper.find('.custom-next__'),
+            $prev = $wrapper.find('.custom-prev__'),
+            $carousel = $wrapper.find('.trust-preview-slide');
+
+        const owl = $carousel.owlCarousel({
+            loop: false,
+            margin: 16,
+            nav: false,
+            dots: false,
+            items: 2,
+            responsive: {
+                0: {items: 1},
+                1200: {items: 2}
+            }
+        });
+        $prev.addClass('disabled');
+
+        // Custom Navigation
+        $next.on('click', () => owl.trigger('next.owl.carousel'));
+        $prev.on('click', () => owl.trigger('prev.owl.carousel'));
+
+        // Handle Disabled State
+        owl.on('initialized.owl.carousel changed.owl.carousel', function (e) {
+            if (!e.item) return;
+
+            const index = e.item.index,
+                total = e.item.count,
+                visible = e.page.size;
+
+            $prev.toggleClass('disabled', index === 0);
+            $next.toggleClass('disabled', index + visible >= total);
+        });
+    });
+    //Popular Clients Preview Slider
+    $('.common-carousel-wrapper').each(function () {
+        const $wrapper = $(this),
+            $next = $wrapper.find('.custom-next__'),
+            $prev = $wrapper.find('.custom-prev__'),
+            $carousel = $wrapper.find('.clients-preview-slide');
+
+        const owl = $carousel.owlCarousel({
+            loop: false,
+            margin: 16,
+            nav: false,
+            dots: false,
+            items: 2,
+            responsive: {
+                0: {
+                    items: 2,
+                    margin: 8,
+                },
+                380: {items: 2},
+                767: {items: 3},
+                1200: {items: 4}
+            }
+        });
+        $prev.addClass('disabled');
+
+        // Custom Navigation
+        $next.on('click', () => owl.trigger('next.owl.carousel'));
+        $prev.on('click', () => owl.trigger('prev.owl.carousel'));
+
+        // Handle Disabled State
+        owl.on('initialized.owl.carousel changed.owl.carousel', function (e) {
+            if (!e.item) return;
+
+            const index = e.item.index,
+                total = e.item.count,
+                visible = e.page.size;
+
+            $prev.toggleClass('disabled', index === 0);
+            $next.toggleClass('disabled', index + visible >= total);
+        });
+    });
+    //Testimonial Preview Slider
+    $('.common-carousel-wrapper').each(function () {
+        const $wrapper = $(this),
+            $next = $wrapper.find('.custom-next__'),
+            $prev = $wrapper.find('.custom-prev__'),
+            $carousel = $wrapper.find('.testimonial-preview-slide');
+
+        const owl = $carousel.owlCarousel({
+            loop: false,
+            margin: 16,
+            nav: false,
+            dots: false,
+            items: 2,
+            responsive: {
+                0: {
+                    items: 1,
+                    margin: 0,
+                },
+                1199: {
+                    items: 1,
+                    margin: 4,
+                }
+            }
+        });
+        $prev.addClass('disabled');
+
+        // Custom Navigation
+        $next.on('click', () => owl.trigger('next.owl.carousel'));
+        $prev.on('click', () => owl.trigger('prev.owl.carousel'));
+
+        // Handle Disabled State
+        owl.on('initialized.owl.carousel changed.owl.carousel', function (e) {
+            if (!e.item) return;
+
+            const index = e.item.index,
+                total = e.item.count,
+                visible = e.page.size;
+
+            $prev.toggleClass('disabled', index === 0);
+            $next.toggleClass('disabled', index + visible >= total);
+        });
+    });
+
+});
+
+(function () {
+
+    if (typeof window.FileUploadValidator !== "undefined") {
+        return;
+    }
+
+    class FileUploadValidator {
+        constructor(inputElement, options = {}) {
+            this.config = {
+                maxSize: 2, // MB
+                allowedTypes: ['webp', 'jpg', 'jpeg', 'png', 'gif'],
+                errorElementId: null,
+                required: true,
+                ...options
+            };
+
+            this.input = inputElement;
+
+            if (!this.input) {
+                console.error('File input element not found');
+                return;
+            }
+
+            this.errorElement = this.initErrorElement();
+            this.attachEventListeners();
+        }
+
+        initErrorElement() {
+            if (this.config.errorElementId) {
+                return document.getElementById(this.config.errorElementId);
+            }
+
+            const parentDiv = this.input.parentElement;
+            const outerWrapper = parentDiv.parentElement;
+
+            if (outerWrapper && outerWrapper.classList.contains('error-wrapper')) {
+                outerWrapper.classList.remove('error-wrapper');
+            }
+
+            let errorElement = parentDiv.nextElementSibling;
+
+            if (!errorElement || !errorElement.classList.contains('file-upload-error')) {
+                errorElement = document.createElement('span');
+                errorElement.className = 'file-upload-error';
+                errorElement.style.cssText = 'color: #dc3545; font-size: 0.875rem; display: none; margin-top: 0.25rem;';
+
+                parentDiv.parentNode.insertBefore(errorElement, parentDiv.nextSibling);
+            }
+
+            return errorElement;
+        }
+
+        attachEventListeners() {
+            this.input.addEventListener('change', () => {
+                this.validate();
+                if (this.input.files && this.input.files.length === 0) {
+                    this.removePreview();
+                }
+                const parentDiv = this.input.closest('.upload-file_custom');
+                if (!parentDiv) return;
+                const textbox = parentDiv.querySelector('.upload-file-textbox');
+                if (textbox) {
+                    const overlay = parentDiv.querySelector('.overlay');
+                    if (overlay) overlay.style.display = 'none';
+                }
+                let overlay = parentDiv.querySelector('.overlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'overlay';
+                    parentDiv.appendChild(overlay);
+                }
+                overlay.style.display = 'block';
+
+                console.log('overlay hidden')
+
+            });
+        }
+
+        removePreview() {
+            const parentDiv = this.input.closest('.upload-file_custom');
+            if (!parentDiv) return;
+
+            this.input.value = '';
+
+            const textbox = parentDiv.querySelector('.upload-file-textbox');
+            if (textbox) {
+                textbox.style.display = 'block';
+                textbox.style.visibility = 'visible';
+                textbox.style.opacity = '1';
+            }
+
+            const uploadFileImg = parentDiv.querySelector('.upload-file-img');
+            if (uploadFileImg) {
+                uploadFileImg.src = uploadFileImg.dataset.defaultSrc || '';
+                uploadFileImg.style.display = 'none';
+            }
+
+
+            const overlay = parentDiv.querySelector('.overlay');
+            console.log(overlay)
+            if (overlay) overlay.style.display = 'none';
+            overlay.classList.remove('show');
+
+
+            const label = parentDiv.querySelector('.upload-file__wrapper');
+            if (label) label.style.pointerEvents = 'auto';
+
+            const previews = parentDiv.querySelectorAll('.preview-image, .image-preview, .upload-preview, img.preview, [data-preview]:not(.overlay)');
+            previews.forEach(el => el.remove());
+        }
+
+        clearError() {
+            if (this.errorElement) {
+                this.errorElement.textContent = '';
+                this.errorElement.style.display = 'none';
+            }
+            this.input.classList.remove('is-invalid');
+        }
+
+        showError(message) {
+            if (this.errorElement) {
+                this.errorElement.textContent = message;
+                this.errorElement.style.display = 'block';
+            }
+            this.input.classList.add('is-invalid');
+            return false;
+        }
+
+        validate() {
+            this.clearError();
+
+            if (!this.input.files || this.input.files.length === 0) {
+                if (this.config.required) {
+                    return this.showError('Please select a file');
+                }
+                return true;
+            }
+
+            const file = this.input.files[0];
+
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!this.config.allowedTypes.includes(fileExtension)) {
+                return this.showError(`Invalid file type. Allowed: ${this.config.allowedTypes.join(', ')}`);
+            }
+
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > this.config.maxSize) {
+                return this.showError(`File size must be less than ${this.config.maxSize}MB. Current: ${fileSizeMB.toFixed(2)}MB`);
+            }
+
+            return true;
+        }
+
+        clear() {
+            this.input.value = '';
+            this.clearError();
+            this.removePreview();
+        }
+
+        static initByClass(className, options = {}) {
+            const inputs = document.querySelectorAll(`.${className}`);
+            const validators = [];
+
+            inputs.forEach(input => {
+                let maxSize = options.maxSize || 2;
+                if (input.dataset.maxSize) {
+                    maxSize = parseFloat(input.dataset.maxSize);
+                }
+
+                let allowedTypes = options.allowedTypes || ['webp', 'jpg', 'jpeg', 'png', 'gif'];
+
+                if (input.dataset.allowedTypes) {
+                    allowedTypes = input.dataset.allowedTypes.split(',').map(t => t.trim());
+                } else if (input.hasAttribute('accept')) {
+                    const acceptTypes = input.getAttribute('accept')
+                        .split(',')
+                        .map(type => type.trim().replace(/^\./, '').toLowerCase())
+                        .filter(type => type.length > 0);
+
+                    if (acceptTypes.length > 0) {
+                        allowedTypes = acceptTypes;
+                    }
+                }
+
+                const elementOptions = {
+                    maxSize: maxSize,
+                    allowedTypes: allowedTypes,
+                    required: input.hasAttribute('required')
+                };
+
+                validators.push(new FileUploadValidator(input, elementOptions));
+            });
+
+            return validators;
+        }
+
+        static validateAll(validators) {
+            let allValid = true;
+            validators.forEach(validator => {
+                if (validator && !validator.validate()) {
+                    allValid = false;
+                }
+            });
+            return allValid;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        window.fileValidators = FileUploadValidator.initByClass('single_file_input', {
+            allowedTypes: ['webp', 'jpg', 'jpeg', 'png', 'gif']
+        });
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                if (window.fileValidators && window.fileValidators.length > 0) {
+                    const formValidators = window.fileValidators.filter(validator =>
+                        form.contains(validator.input)
+                    );
+
+                    if (formValidators.length > 0 && !FileUploadValidator.validateAll(formValidators)) {
+                        e.preventDefault();
+                        const firstError = form.querySelector('.is-invalid');
+                        if (firstError) {
+                            firstError.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        }
+                    }
+                }
+            });
+        });
+    });
+    document.querySelectorAll('.upload-file__wrapper').forEach(wrapper => {
+        wrapper.addEventListener('click', function (e) {
+            const input = this.parentElement.querySelector('input[type="file"]');
+            if (input) {
+                input.click();
+            }
+        });
+    });
+
+    window.validateFileInputs = function () {
+        return FileUploadValidator.validateAll(window.fileValidators || []);
+    };
+    window.FileUploadValidator = FileUploadValidator;
+})();

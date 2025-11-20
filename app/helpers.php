@@ -294,6 +294,19 @@ if (!function_exists('config_settings')) {
             return true;
         }
     }
+    if (! function_exists('getEnvMode')) {
+         function getEnvMode()
+            {
+                $configKey='envAppMode_conf';
+                if (Config::has($configKey)) {
+                    $data = Config::get($configKey);
+                } else {
+                    $data = env('APP_MODE')??'demo';
+                    Config::set($configKey, $data);
+                }
+                return $data;
+            }
+    }
 
 
 

@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\CentralLogics\Helpers;
 use App\Scopes\ZoneScope;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;

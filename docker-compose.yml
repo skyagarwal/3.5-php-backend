@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mangwale_php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    networks:
+      - mangwale_network
+    environment:
+      - DB_HOST=mysql
+      - DB_DATABASE=mangwale_db
+      - DB_USERNAME=mangwale_user
+      - DB_PASSWORD=admin123
+      - APP_URL=https://testing.mangwale.com
+      - APP_ENV=production
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    container_name: mangwale_nginx
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+      - "8443:443"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - mangwale_network
+      - traefik_default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mangwale.rule=Host(`testing.mangwale.com`)"
+      - "traefik.http.routers.mangwale.entrypoints=websecure"
+      - "traefik.http.routers.mangwale.tls.certresolver=letsencrypt"
+      - "traefik.docker.network=traefik_default"
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:8.0
+    container_name: mangwale_mysql
+    restart: unless-stopped
+    ports:
+      - "23306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mangwale_db
+      MYSQL_USER: mangwale_user
+      MYSQL_PASSWORD: admin123
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - mangwale_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: mangwale_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - mangwale_network
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: mangwale_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+    networks:
+      - mangwale_network
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+
+networks:
+  mangwale_network:
+    driver: bridge
+  traefik_default:
+    external: true

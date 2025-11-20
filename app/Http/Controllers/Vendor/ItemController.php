@@ -55,6 +55,29 @@ class ItemController extends Controller
         return view('vendor-views.product.index', compact('categories', 'module_data', 'conditions', 'brands', 'productWiseTax', 'taxVats'));
     }
 
+
+    public function  getBrandList(Request $request){
+
+        $data =  Brand::active()->where(function($query){
+            $query->whereNull('module_id')->orWhere('module_id',  Helpers::get_store_data()->module_id);
+            })->where('name', 'like', '%'.$request->q.'%')->limit(10)->get();
+
+            $formattedData = $data->map(function ($brand) {
+                return [
+                    'id' => $brand->id,
+                    'text' => $brand->name,
+                ];
+            });
+
+        if(isset($request->all))
+        {
+            $formattedData[]=(object)['id'=>'all', 'text'=>translate('messages.all')];
+        }
+        return response()->json($formattedData);
+
+
+    }
+
     public function store(Request $request)
     {
         if (!Helpers::get_store_data()->item_section) {

@@ -58,7 +58,7 @@ class CommonCondition extends Model
      */
     public function items(): HasMany
     {
-        return $this->hasMany(PharmacyItemDetails::class,'common_condition_id','id');
+        return $this->hasMany(PharmacyItemDetails::class,'common_condition_id','id')->whereNotNull('item_id');
     }
 
     /**

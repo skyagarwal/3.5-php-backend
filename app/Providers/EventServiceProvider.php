@@ -27,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        \Laravel\Reverb\Events\MessageReceived::class => [
+        \App\Listeners\HandleClientMessage::class,
+    ],
     ];
 
     /**

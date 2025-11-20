@@ -817,6 +817,9 @@ class Store extends Model
             $store->save();
         });
         static::saved(function ($model) {
+            Helpers::deleteCacheData('advertisement_');
+            Helpers::deleteCacheData('banner_');
+
             if($model->isDirty('logo')){
                 $value = Helpers::getDisk();
 
@@ -856,6 +859,10 @@ class Store extends Model
                     'updated_at' => now(),
                 ]);
             }
+        });
+        static::updated(function(){
+            Helpers::deleteCacheData('advertisement_');
+            Helpers::deleteCacheData('banner_');
         });
     }
 

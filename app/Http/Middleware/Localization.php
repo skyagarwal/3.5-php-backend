@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\BusinessSetting;
+use App\CentralLogics\Helpers;
 use Closure;
 use Illuminate\Support\Facades\App;
 
@@ -21,9 +21,9 @@ class Localization
         $lang ='en';
         $direction ='ltr';
         try {
-            $language = BusinessSetting::where('key', 'system_language')->first();
+            $language =  Helpers::get_business_settings('system_language') ;
             if($language){
-                foreach (json_decode($language->value, true) as $key => $data) {
+                foreach ($language as $key => $data) {
                     if ($data['default']) {
                         $lang= $data['code'];
                         $direction= $data['direction'];
