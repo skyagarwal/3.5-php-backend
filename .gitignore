@@ -19,3 +19,9 @@ docker-local/
 .idea/
 .vscode/
 .ddev/
+
+# Large files - do not commit
+Admin panel update to V3.5.zip
+config/admin_prod.sql
+*.sql.gz
+*.sql.bz2
