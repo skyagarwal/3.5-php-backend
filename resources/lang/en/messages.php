@@ -8434,4 +8434,5 @@ Smartly or Earn. ',
   'The offset field is required.' => 'The offset field is required.',
   'Ecommerce' => 'Ecommerce',
   'Once saved, your tax setup will instantly affect all applicable orders moving forward.' => 'Once saved, your tax setup will instantly affect all applicable orders moving forward.',
+  'Sent_notification_on_deliveryman_withdraw_rejaction' => 'Sent notification on deliveryman withdraw rejaction',
 );
